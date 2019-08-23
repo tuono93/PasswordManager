@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CheckPwdFragment">
+
+    <TextView
+        android:id="@+id/textPwd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="17dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/insPassw"
+        android:textColor="@color/White"
+        android:textSize="18dp"
+        android:textStyle="italic" />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutPwd"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/textPwd"
+        android:weightSum="9">
+
+        <TextView style="@style/TextViewPwd" />
+
+        <EditText
+            android:id="@+id/editText1"
+            style="@style/editTextPwd"
+            android:focusableInTouchMode="true" />
+
+        <TextView style="@style/TextViewPwd" />
+
+        <EditText
+            android:id="@+id/editText2"
+            style="@style/editTextPwd"
+            android:focusableInTouchMode="false" />
+
+        <TextView style="@style/TextViewPwd" />
+
+        <EditText
+            android:id="@+id/editText3"
+            style="@style/editTextPwd"
+            android:focusableInTouchMode="false" />
+
+        <TextView style="@style/TextViewPwd" />
+
+        <EditText
+            android:id="@+id/editText4"
+            style="@style/editTextPwd"
+            android:focusableInTouchMode="false" />
+
+        <TextView style="@style/TextViewPwd" />
+    </LinearLayout>
+</RelativeLayout>

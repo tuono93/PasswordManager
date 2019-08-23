@@ -1,0 +1,393 @@
+package it.passwordmanager.simonederozeris.passwordmanager;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.Flusso;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoCheckPwd;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
+
+import static it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoCheckPwd.CHECK;
+import static it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoNuovaPwd.CONFERMA;
+import static it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoNuovaPwd.NUOVA;
+
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link CheckPwdFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link CheckPwdFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class CheckPwdFragment extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String GESTIONE = "";
+
+
+    private static final String ARG_NUM_FLUSSO = "num_flusso";
+    private static final String ARG_STEP_CORRENTE= "step_corrente";
+    private static final String ARG_STATO = "stato";
+    private static final String ARG_LAYOUT_CONTAINER = "layout_container";
+
+
+    public EditText editTextPwd1, editTextPwd2, editTextPwd3, editTextPwd4;
+    public LinearLayout linearLayoutPwd;
+    public TextView textPwd;
+    Animation animationPwd;
+
+
+
+
+    // TODO: Rename and change types of parameters
+    private Flusso flusso;
+    private TipoStatoPwd stato;
+    private int layout_container;
+
+    private static int getNumFlusso(Flusso flusso){
+        int numFlusso;
+
+        if(flusso.getClass().getName().equals(FlussoModificaPwd.class.getName())){
+            numFlusso = 1;
+        } else {
+            numFlusso = 2;
+        }
+
+        return numFlusso;
+    }
+
+    private static Flusso getFlusso(int numFlusso,int stepCorrente){
+        Flusso flusso = null;
+
+        if(numFlusso==1){
+            flusso = new FlussoModificaPwd(stepCorrente);
+        } else {
+            flusso = new FlussoCheckPwd(stepCorrente);
+        }
+
+        return flusso;
+    }
+
+    private OnFragmentInteractionListener mListener;
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param flusso Parameter 1.
+     * @param stato Parameter 2.
+     * @return A new instance of fragment CheckPwdFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static CheckPwdFragment newInstance(Flusso flusso, TipoStatoPwd stato,int layout_container) {
+        CheckPwdFragment fragment = new CheckPwdFragment();
+        int numFlusso = getNumFlusso(flusso);
+        Bundle args = new Bundle();
+        args.putString(ARG_NUM_FLUSSO, ""+numFlusso);
+        args.putString(ARG_STEP_CORRENTE, ""+flusso.getCurrentStep());
+        args.putString(ARG_STATO, stato.getTipoStato());
+        args.putString(ARG_LAYOUT_CONTAINER,"" + layout_container);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            flusso = getFlusso(Integer.parseInt(getArguments().getString(ARG_NUM_FLUSSO)),Integer.parseInt(getArguments().getString(ARG_STEP_CORRENTE)));
+            stato = TipoStatoPwd.getEnumStatoGestione(getArguments().getString(ARG_STATO));
+            layout_container = Integer.parseInt(getArguments().getString(ARG_LAYOUT_CONTAINER));
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_check_pwd, container, false);
+        editTextPwd1 = (EditText) rootView.findViewById(R.id.editText1);
+        editTextPwd2 = (EditText) rootView.findViewById(R.id.editText2);
+        editTextPwd3 = (EditText) rootView.findViewById(R.id.editText3);
+        editTextPwd4 = (EditText) rootView.findViewById(R.id.editText4);
+        textPwd = (TextView) rootView.findViewById(R.id.textPwd);
+        linearLayoutPwd = (LinearLayout) rootView.findViewById(R.id.linearLayoutPwd);
+
+        return rootView;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        setEditText();
+        if(stato == TipoStatoPwd.ERR){
+            textPwd.setText(getResources().getString(R.string.insPasswErr));
+            textPwd.setTextColor(getResources().getColor(R.color.customRed));
+            editTextPwd1.setBackground(getResources().getDrawable(R.drawable.edit_text_password_errata));
+            editTextPwd2.setBackground(getResources().getDrawable(R.drawable.edit_text_password_errata));
+            editTextPwd3.setBackground(getResources().getDrawable(R.drawable.edit_text_password_errata));
+            editTextPwd4.setBackground(getResources().getDrawable(R.drawable.edit_text_password_errata));
+
+            editTextPwd1.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View arg0, MotionEvent arg1) {
+                    if (flusso.getCurrentStep() == 1) {
+                        textPwd.setText(getResources().getString(R.string.insPassw));
+                    }else {
+                        textPwd.setText(getResources().getString(R.string.insConfNewPassw));
+                    }
+                    textPwd.setTextColor(getResources().getColor(R.color.White));
+                    editTextPwd1.setBackground(getResources().getDrawable(R.drawable.edit_text_password));
+                    editTextPwd2.setBackground(getResources().getDrawable(R.drawable.edit_text_password));
+                    editTextPwd3.setBackground(getResources().getDrawable(R.drawable.edit_text_password));
+                    editTextPwd4.setBackground(getResources().getDrawable(R.drawable.edit_text_password));
+                    return false;
+                }
+            });
+            stato = TipoStatoPwd.OK;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    public void setEditText() {
+        editTextPwd1.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode != KeyEvent.KEYCODE_DEL) {
+                    editTextPwd2.requestFocus();
+                    editTextPwd2.setFocusableInTouchMode(true);
+                    editTextPwd1.setFocusableInTouchMode(false);
+                } else {
+                }
+                return false;
+            }
+        });
+
+        editTextPwd2.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode != KeyEvent.KEYCODE_DEL) {
+                    editTextPwd3.requestFocus();
+                    editTextPwd3.setFocusableInTouchMode(true);
+                    editTextPwd2.setFocusableInTouchMode(false);
+                } else {
+                    editTextPwd1.setText("");
+                    editTextPwd1.requestFocus();
+                    editTextPwd2.setFocusableInTouchMode(false);
+                    editTextPwd1.setFocusableInTouchMode(true);
+                }
+
+                return false;
+            }
+        });
+
+        editTextPwd3.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode != KeyEvent.KEYCODE_DEL) {
+                    editTextPwd4.requestFocus();
+                    editTextPwd4.setFocusableInTouchMode(true);
+                    editTextPwd3.setFocusableInTouchMode(false);
+                } else {
+                    editTextPwd2.setText("");
+                    editTextPwd2.requestFocus();
+                    editTextPwd3.setFocusableInTouchMode(false);
+                    editTextPwd2.setFocusableInTouchMode(true);
+                }
+                return false;
+            }
+        });
+
+        editTextPwd4.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (event.getAction()!=KeyEvent.ACTION_DOWN)
+                    return false;
+
+                if (keyCode != KeyEvent.KEYCODE_DEL) {
+                    //start controllo pwd
+                    char unicodeChar = (char) event.getUnicodeChar();
+                    Log.i("PASSCODE", "" + unicodeChar);
+                    String p1 = editTextPwd1.getText().toString();
+                    String p2 = editTextPwd2.getText().toString();
+                    String p3 = editTextPwd3.getText().toString();
+                    String passcode = p1 + p2 + p3 + unicodeChar;
+                    Log.i("PASSCODE", passcode);
+
+                    gestioneFlusso(passcode);
+
+                } else {
+                    editTextPwd3.setText("");
+                    editTextPwd3.requestFocus();
+                    editTextPwd4.setFocusableInTouchMode(false);
+                    editTextPwd3.setFocusableInTouchMode(true);
+                }
+                return false;
+            }
+        });
+    }
+
+    public void gestioneFlusso(String passcode){
+        if(flusso.getClass().getName().equals(FlussoModificaPwd.class.getName())){
+            switch (((FlussoModificaPwd) flusso).getTipoNuovaPwd()){
+                case NUOVA:
+                    flusso.goNextStep(NUOVA.getStep());
+                    confermaPassword();
+                    break;
+                case CONFERMA:
+                    if (passcode.equalsIgnoreCase("5883")) {
+                        flusso.goNextStep(CONFERMA.getStep());
+                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+                        //Find the currently focused view, so we can grab the correct window token from it.
+                        View view = getActivity().getCurrentFocus();
+                        //If no view currently has focus, create a new one, just so we can grab a window token from it
+                        if (view == null) {
+                            view = new View(getActivity());
+                        }
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                        getActivity().getSupportFragmentManager().beginTransaction().detach(this).commit();
+                        Toast.makeText(getActivity(),"Nuovo passcode salvato",Toast.LENGTH_LONG).show();
+                    } else {
+                        passwordErrata();
+                    }
+                    break;
+            }
+        } else {
+            switch (((FlussoCheckPwd) flusso).getTipoCheckPwd()){
+                case CHECK:
+                    if (passcode.equalsIgnoreCase("5883")) {
+                        flusso.goNextStep(CHECK.getStep());
+                        passwordEsatta();
+                    } else {
+                        passwordErrata();
+                    }
+                    break;
+            }
+        }
+    }
+
+    public void confermaPassword() {
+
+        editTextPwd1.requestFocus();
+        editTextPwd1.setFocusableInTouchMode(true);
+        editTextPwd4.setFocusableInTouchMode(false);
+
+        animationPwd = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_animation_exit);
+        animationPwd.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation arg0) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation arg0) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation arg0) {
+                editTextPwd1.setText("");
+                editTextPwd2.setText("");
+                editTextPwd3.setText("");
+                editTextPwd4.setText("");
+                animationPwd = AnimationUtils.loadAnimation(getActivity(), R.anim.translate_animation_enter);
+                animationPwd.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation arg0) {
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation arg0) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation arg0) {
+                        textPwd.setText(getResources().getString(R.string.insConfNewPassw));
+                        editTextPwd1.setText("");
+                        editTextPwd2.setText("");
+                        editTextPwd3.setText("");
+                        editTextPwd4.setText("");
+                        editTextPwd1.requestFocus();
+                        editTextPwd1.setFocusableInTouchMode(true);
+                        editTextPwd4.setFocusableInTouchMode(false);
+                    }
+                });
+                linearLayoutPwd.startAnimation(animationPwd);
+            }
+        });
+        linearLayoutPwd.startAnimation(animationPwd);
+    }
+
+    public void passwordErrata() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = getActivity().getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(getActivity());
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        CheckPwdFragment fragmentCheckPwd = CheckPwdFragment.newInstance(flusso,TipoStatoPwd.ERR,layout_container);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(layout_container,fragmentCheckPwd).commit();
+    }
+
+    public void passwordEsatta() {
+        Intent toMain = new Intent(getActivity(), MainActivity.class);
+        startActivity(toMain);
+        getActivity().finish();
+    }
+}

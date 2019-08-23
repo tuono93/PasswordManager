@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">PasswordManager</string>
+    <string name="titolo">Benvenuto in Password Manager</string>
+    <string name="insPassw">Inserisci il tuo passcode</string>
+    <string name="insPasswErr">Passcode errato</string>
+    <string name="insConfNewPassw">Conferma la tua nuova passcode</string>
+    <string name="title_activity_list">ListActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="cambia_pwd_string">Cambia Password</string>
+    <string name="esci">Esci</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

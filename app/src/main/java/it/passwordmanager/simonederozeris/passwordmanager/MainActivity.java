@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.menu_button2);
         setDrawer();
         setNavigationView();
+        Fragment fragmentAccountList = AccountListFragment.newInstance();
+        getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentAccountList).commit();
     }
 
     public void setDrawer(){
@@ -64,13 +66,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 Log.d("navView","Selected" + menuItem);
                 final int itemId = menuItem.getItemId();
-
                 switch(itemId){
+                    case R.id.list_account:
+                        Fragment fragmentAccountList = AccountListFragment.newInstance();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentAccountList).commit();
+                        break;
                     case R.id.cambia_pwd:
                         Fragment fragmentCheckPwd = CheckPwdFragment.newInstance(new FlussoModificaPwd(), TipoStatoPwd.OK,R.id.anchor_point_main);
                         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentCheckPwd).commit();
                         break;
                     case R.id.esci:
+                        finish();
                         break;
                     default:
                         break;

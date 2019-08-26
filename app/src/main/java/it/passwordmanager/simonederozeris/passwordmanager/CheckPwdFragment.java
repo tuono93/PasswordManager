@@ -41,11 +41,6 @@ import static it.passwordmanager.simonederozeris.passwordmanager.it.passwordmana
  * create an instance of this fragment.
  */
 public class CheckPwdFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String GESTIONE = "";
-
-
     private static final String ARG_NUM_FLUSSO = "num_flusso";
     private static final String ARG_STEP_CORRENTE= "step_corrente";
     private static final String ARG_STATO = "stato";

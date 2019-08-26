@@ -6,6 +6,7 @@
     <string name="insConfNewPassw">Conferma la tua nuova passcode</string>
     <string name="title_activity_list">ListActivity</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="list_account_string">Account</string>
     <string name="cambia_pwd_string">Cambia Password</string>
     <string name="esci">Esci</string>
 

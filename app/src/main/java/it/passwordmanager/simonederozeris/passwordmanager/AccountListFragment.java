@@ -67,6 +67,12 @@ public class AccountListFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: FAB SELEZIONATO
+            }
+        });
     }
 
     @Override

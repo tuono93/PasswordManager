@@ -315,6 +315,7 @@ public class CheckPwdFragment extends Fragment {
 
                         Toast.makeText(getActivity(),"Nuovo passcode salvato",Toast.LENGTH_LONG).show();
                         passwordEsatta();
+
                     } else {
                         passwordErrata();
                     }

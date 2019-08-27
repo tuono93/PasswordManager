@@ -1,7 +1,9 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -21,6 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.Flusso;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoCheckPwd;
@@ -45,12 +49,17 @@ public class CheckPwdFragment extends Fragment {
     private static final String ARG_STEP_CORRENTE= "step_corrente";
     private static final String ARG_STATO = "stato";
     private static final String ARG_LAYOUT_CONTAINER = "layout_container";
+    private static final String ARG_VALUE = "value";
+
 
 
     public EditText editTextPwd1, editTextPwd2, editTextPwd3, editTextPwd4;
     public LinearLayout linearLayoutPwd;
     public TextView textPwd;
     Animation animationPwd;
+
+    SharedPreferences sharedPreferences;
+
 
 
 
@@ -72,13 +81,13 @@ public class CheckPwdFragment extends Fragment {
         return numFlusso;
     }
 
-    private static Flusso getFlusso(int numFlusso,int stepCorrente){
+    private static Flusso getFlusso(int numFlusso,int stepCorrente,String value){
         Flusso flusso = null;
 
         if(numFlusso==1){
-            flusso = new FlussoModificaPwd(stepCorrente);
+            flusso = new FlussoModificaPwd(stepCorrente,value);
         } else {
-            flusso = new FlussoCheckPwd(stepCorrente);
+            flusso = new FlussoCheckPwd(stepCorrente,value);
         }
 
         return flusso;
@@ -103,6 +112,7 @@ public class CheckPwdFragment extends Fragment {
         args.putString(ARG_STEP_CORRENTE, ""+flusso.getCurrentStep());
         args.putString(ARG_STATO, stato.getTipoStato());
         args.putString(ARG_LAYOUT_CONTAINER,"" + layout_container);
+        args.putString(ARG_VALUE,"" + flusso.getValue());
         fragment.setArguments(args);
         return fragment;
     }
@@ -111,10 +121,11 @@ public class CheckPwdFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            flusso = getFlusso(Integer.parseInt(getArguments().getString(ARG_NUM_FLUSSO)),Integer.parseInt(getArguments().getString(ARG_STEP_CORRENTE)));
+            flusso = getFlusso(Integer.parseInt(getArguments().getString(ARG_NUM_FLUSSO)),Integer.parseInt(getArguments().getString(ARG_STEP_CORRENTE)),getArguments().getString(ARG_VALUE));
             stato = TipoStatoPwd.getEnumStatoGestione(getArguments().getString(ARG_STATO));
             layout_container = Integer.parseInt(getArguments().getString(ARG_LAYOUT_CONTAINER));
         }
+        sharedPreferences = getActivity().getSharedPreferences(Constant.PASSCODE, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -258,12 +269,10 @@ public class CheckPwdFragment extends Fragment {
                 if (keyCode != KeyEvent.KEYCODE_DEL) {
                     //start controllo pwd
                     char unicodeChar = (char) event.getUnicodeChar();
-                    Log.i("PASSCODE", "" + unicodeChar);
                     String p1 = editTextPwd1.getText().toString();
                     String p2 = editTextPwd2.getText().toString();
                     String p3 = editTextPwd3.getText().toString();
                     String passcode = p1 + p2 + p3 + unicodeChar;
-                    Log.i("PASSCODE", passcode);
 
                     gestioneFlusso(passcode);
 
@@ -282,11 +291,14 @@ public class CheckPwdFragment extends Fragment {
         if(flusso.getClass().getName().equals(FlussoModificaPwd.class.getName())){
             switch (((FlussoModificaPwd) flusso).getTipoNuovaPwd()){
                 case NUOVA:
+                    Log.i("nuova_passcode",passcode);
+                    flusso.setValue(passcode);
                     flusso.goNextStep(NUOVA.getStep());
                     confermaPassword();
                     break;
                 case CONFERMA:
-                    if (passcode.equalsIgnoreCase("5883")) {
+                    Log.i("precedente_passcode", flusso.getValue());
+                    if (passcode.equalsIgnoreCase(flusso.getValue())) {
                         flusso.goNextStep(CONFERMA.getStep());
                         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
                         //Find the currently focused view, so we can grab the correct window token from it.
@@ -296,22 +308,40 @@ public class CheckPwdFragment extends Fragment {
                             view = new View(getActivity());
                         }
                         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        getActivity().getSupportFragmentManager().beginTransaction().detach(this).commit();
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(Constant.PASSCODE_VALUE,passcode);
+                        editor.commit();
+
                         Toast.makeText(getActivity(),"Nuovo passcode salvato",Toast.LENGTH_LONG).show();
+                        passwordEsatta();
                     } else {
                         passwordErrata();
                     }
+                    break;
+                case FINISH:
                     break;
             }
         } else {
             switch (((FlussoCheckPwd) flusso).getTipoCheckPwd()){
                 case CHECK:
-                    if (passcode.equalsIgnoreCase("5883")) {
-                        flusso.goNextStep(CHECK.getStep());
+                    String passcodeSalvato = sharedPreferences.getString(Constant.PASSCODE_VALUE,null);
+
+                    Log.i("salvato_passcode",passcodeSalvato);
+                    Log.i("check_passcode",passcode);
+
+                    if (passcodeSalvato == null){
+                        Toast.makeText(getActivity(),"Errore salvataggio passcode. Reinseriscilo in Cambia Password dal menu",Toast.LENGTH_LONG).show();
                         passwordEsatta();
                     } else {
-                        passwordErrata();
+                        if (passcode.equalsIgnoreCase(passcodeSalvato)) {
+                            flusso.goNextStep(CHECK.getStep());
+                            passwordEsatta();
+                        } else {
+                            passwordErrata();
+                        }
                     }
+
                     break;
             }
         }

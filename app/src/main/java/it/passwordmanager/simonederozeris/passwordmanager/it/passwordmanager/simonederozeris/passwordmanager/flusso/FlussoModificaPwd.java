@@ -3,13 +3,15 @@ package it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.si
 public class FlussoModificaPwd implements Flusso {
 
    TipoNuovaPwd tipoNuovaPwd;
+   String value = "";
 
     public FlussoModificaPwd() {
         this.tipoNuovaPwd = TipoNuovaPwd.NUOVA;
     }
 
-    public FlussoModificaPwd(int stepCorrente) {
+    public FlussoModificaPwd(int stepCorrente,String value) {
         this.tipoNuovaPwd = TipoNuovaPwd.getEnumTipoNuovaPwd(stepCorrente);
+        this.value = value;
     }
 
     public TipoNuovaPwd getTipoNuovaPwd() {
@@ -29,5 +31,15 @@ public class FlussoModificaPwd implements Flusso {
     @Override
     public int getCurrentStep() {
         return tipoNuovaPwd.getStep();
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public void setValue(String value) {
+        this.value = value;
     }
 }

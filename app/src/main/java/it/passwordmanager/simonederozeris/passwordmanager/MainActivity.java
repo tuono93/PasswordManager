@@ -1,22 +1,23 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-
 import com.google.android.material.navigation.NavigationView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
+import android.widget.Toast;
+import java.util.List;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
 
@@ -26,10 +27,15 @@ public class MainActivity extends AppCompatActivity {
     public Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
+    PasswordManagerDatabase db;
+    Exception mException = null;
+    MainActivity mainActivity;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = this;
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         titleToolbar = (TextView) findViewById(R.id.toolbar_title);
@@ -108,6 +114,57 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        //db = PasswordManagerDatabase.getDatabase(this);
+        //testDB();
+    }
+
+    public void testDB(){
+        mException = null;
+        new ReadDBAsync().execute();
+        //db.destroyInstance(); PER CHIUDERE L'ISTANZA
+    }
+
+    private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<Account> doInBackground(Void... voids) {
+            List<Account> accountList = null;
+            try {
+                Account account = new Account("test", "testPwd", "testNota");
+                db.getAccountDAO().insertAccount(account);
+                accountList = db.getAccountDAO().findAllAccount();
+            }  catch (Exception e) {
+                mException = e;
+            }
+            return accountList;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... voids)
+        {
+            super.onProgressUpdate(voids);
+        }
+
+        @Override
+        protected void onPostExecute(List<Account> result)
+        {
+            super.onPostExecute(result);
+            if(mException == null){
+                for (Account account : result) {
+                    Log.i("ACCOUNT ", "ID ACCOUNT: " + account.getId());
+                    Log.i("ACCOUNT ", "NOME ACCOUNT: " + account.getNome());
+                    Log.i("ACCOUNT ", "PASSWORD ACCOUNT: " + account.getPassword());
+                    Log.i("ACCOUNT ", "NOTE ACCOUNT: " + account.getNota());
+                }
+            } else {
+                Toast.makeText(mainActivity,mException.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override

@@ -313,9 +313,8 @@ public class CheckPwdFragment extends Fragment {
                         editor.putString(Constant.PASSCODE_VALUE,passcode);
                         editor.commit();
 
-                        Toast.makeText(getActivity(),"Nuovo passcode salvato",Toast.LENGTH_LONG).show();
-                        passwordEsatta();
-
+                       // Toast.makeText(getActivity(),"Nuovo passcode salvato",Toast.LENGTH_LONG).show();
+                        passwordEsatta(true);
                     } else {
                         passwordErrata();
                     }
@@ -333,11 +332,11 @@ public class CheckPwdFragment extends Fragment {
 
                     if (passcodeSalvato == null){
                         Toast.makeText(getActivity(),"Errore salvataggio passcode. Reinseriscilo in Cambia Password dal menu",Toast.LENGTH_LONG).show();
-                        passwordEsatta();
+                        passwordEsatta(false);
                     } else {
                         if (passcode.equalsIgnoreCase(passcodeSalvato)) {
                             flusso.goNextStep(CHECK.getStep());
-                            passwordEsatta();
+                            passwordEsatta(false);
                         } else {
                             passwordErrata();
                         }
@@ -411,8 +410,9 @@ public class CheckPwdFragment extends Fragment {
         getActivity().getSupportFragmentManager().beginTransaction().replace(layout_container,fragmentCheckPwd).commit();
     }
 
-    public void passwordEsatta() {
+    public void passwordEsatta(boolean viewSnack) {
         Intent toMain = new Intent(getActivity(), MainActivity.class);
+        toMain.putExtra("view_snack",viewSnack);
         startActivity(toMain);
         getActivity().finish();
     }

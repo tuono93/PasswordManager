@@ -1,8 +1,11 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -46,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
         setNavigationView();
         Fragment fragmentAccountList = AccountListFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentAccountList).commit();
+        Boolean viewSnack = getIntent().getBooleanExtra("view_snack",false);
+        if(viewSnack){
+            View parentLayout = findViewById(android.R.id.content);
+            Snackbar.make(parentLayout, "Nuovo passcode salvato", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     public void setDrawer(){

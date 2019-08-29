@@ -14,24 +14,27 @@
         android:layout_height="60dp"
         android:background="@color/Black"
         android:elevation="4dp"
+        android:gravity="center"
         android:paddingLeft="0dp"
         android:paddingRight="0dp"
-        android:gravity="center"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
-        app:contentInsetStartWithNavigation="0dp">
+        app:contentInsetStartWithNavigation="0dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar">
 
-            <TextView
-                android:id="@+id/toolbar_title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginRight="50dp"
-                android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-                android:textColor="@color/LightGoldenrodYellow" />
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="50dp"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+            android:textColor="@color/LightGoldenrodYellow" />
+
+
+
     </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -51,8 +54,8 @@
             android:scaleType="centerInside"
             android:src="@drawable/account"/>
 
-        <EditText
-            android:id="@+id/account_text"
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteNomeAccount"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
@@ -64,8 +67,8 @@
             android:inputType="text"
             android:textSize="16dp"
             android:hint="Nome Account"
-            android:textColorHint="@color/White"
-            />
+            android:textColorHint="@color/White"/>
+
     </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -111,7 +114,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/note_image"
@@ -123,17 +126,18 @@
         <EditText
             android:id="@+id/note_text"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:textColor="@color/White"
-            android:fontFamily="sans-serif-condensed"
-            android:textStyle="bold|italic"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/layoutNote"
+            android:layout_alignEnd="@+id/layoutNote"
             android:layout_marginLeft="40dp"
-            android:inputType="text"
-            android:textSize="16dp"
+            android:ems="10"
+            android:fontFamily="sans-serif-condensed"
             android:hint="Note"
+            android:inputType="textMultiLine"
+            android:textColor="@color/White"
             android:textColorHint="@color/White"
-            />
+            android:textSize="16dp"
+            android:textStyle="bold|italic" />
     </LinearLayout>
 
 </RelativeLayout>

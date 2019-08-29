@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme"
+    tools:context=".DettaglioAccountActivity"
+    android:id="@+id/layoutList">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarDettaglio"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/Black"
+        android:elevation="4dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:gravity="center"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp">
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="50dp"
+                android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                android:textColor="@color/LightGoldenrodYellow" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutAccount"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/toolbarDettaglio"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/account_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/account"/>
+
+        <EditText
+            android:id="@+id/account_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="@color/White"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold|italic"
+            android:layout_marginLeft="40dp"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textSize="16dp"
+            android:hint="Nome Account"
+            android:textColorHint="@color/White"
+            />
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutPwd"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/layoutAccount"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/key_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/key"/>
+
+        <EditText
+            android:id="@+id/key_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="@color/White"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold|italic"
+            android:layout_marginLeft="40dp"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textSize="16dp"
+            android:hint="Password"
+            android:textColorHint="@color/White"
+            />
+    </LinearLayout>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutNote"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/layoutPwd"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/note_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/note"/>
+
+        <EditText
+            android:id="@+id/note_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="@color/White"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold|italic"
+            android:layout_marginLeft="40dp"
+            android:inputType="text"
+            android:textSize="16dp"
+            android:hint="Note"
+            android:textColorHint="@color/White"
+            />
+    </LinearLayout>
+
+</RelativeLayout>

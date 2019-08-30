@@ -30,9 +30,8 @@ public class MainActivity extends AppCompatActivity {
     public Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
-    PasswordManagerDatabase db;
-    Exception mException = null;
     MainActivity mainActivity;
+    static String stringSnackStatic = "";
 
 
     @Override
@@ -49,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         setNavigationView();
         Fragment fragmentAccountList = AccountListFragment.newInstance();
         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentAccountList).commit();
-        Boolean viewSnack = getIntent().getBooleanExtra("view_snack",false);
-        if(viewSnack){
+        String stringSnack = getIntent().getStringExtra("view_snack");
+        if(stringSnack != null && !stringSnack.equals("")){
             View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, "Nuovo passcode salvato", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(parentLayout, stringSnack, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -122,56 +121,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //db = PasswordManagerDatabase.getDatabase(this);
-        //testDB();
-    }
-
-    public void testDB(){
-        mException = null;
-        new ReadDBAsync().execute();
-        //db.destroyInstance(); PER CHIUDERE L'ISTANZA
-    }
-
-    private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected List<Account> doInBackground(Void... voids) {
-            List<Account> accountList = null;
-            try {
-                Account account = new Account("test", "testPwd", "testNota");
-                db.getAccountDAO().insertAccount(account);
-                accountList = db.getAccountDAO().findAllAccount();
-            }  catch (Exception e) {
-                mException = e;
-            }
-            return accountList;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... voids)
-        {
-            super.onProgressUpdate(voids);
-        }
-
-        @Override
-        protected void onPostExecute(List<Account> result)
-        {
-            super.onPostExecute(result);
-            if(mException == null){
-                for (Account account : result) {
-                    Log.i("ACCOUNT ", "ID ACCOUNT: " + account.getId());
-                    Log.i("ACCOUNT ", "NOME ACCOUNT: " + account.getNome());
-                    Log.i("ACCOUNT ", "PASSWORD ACCOUNT: " + account.getPassword());
-                    Log.i("ACCOUNT ", "NOTE ACCOUNT: " + account.getNota());
-                }
-            } else {
-                Toast.makeText(mainActivity,mException.getMessage(),Toast.LENGTH_LONG).show();
-            }
+        if(!stringSnackStatic.equals("")){
+            View parentLayout = findViewById(android.R.id.content);
+            Snackbar.make(parentLayout, stringSnackStatic, Snackbar.LENGTH_LONG).show();
+            stringSnackStatic = "";
         }
     }
 

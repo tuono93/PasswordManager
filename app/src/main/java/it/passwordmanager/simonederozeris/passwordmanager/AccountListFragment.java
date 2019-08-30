@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,15 +12,19 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +39,9 @@ public class AccountListFragment extends Fragment {
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
     private AccountAdapter adapter;
+    PasswordManagerDatabase db;
+    Exception mException = null;
+    List<Account> list;
 
     private OnFragmentInteractionListener mListener;
 
@@ -59,8 +67,7 @@ public class AccountListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_account_list, container, false);
         fab = (FloatingActionButton) rootView.findViewById(R.id.fabNewAccount);
@@ -71,16 +78,58 @@ public class AccountListFragment extends Fragment {
         LineItemDecoration lineItemDecoration = new LineItemDecoration();
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(lineItemDecoration);
-
-
-        Account account = new Account("Facebook","1234","");
-        Account account2 = new Account("Youtube","1234","");
-        ArrayList<Account> list = new ArrayList<Account>();
-        list.add(account);
-        list.add(account2);
-        adapter = new AccountAdapter(list);
-        mRecyclerView.setAdapter(adapter);
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        db = PasswordManagerDatabase.getDatabase(getActivity());
+        getListDB();
+    }
+
+    public void getListDB(){
+        mException = null;
+        new ReadDBAsync().execute();
+        db.destroyInstance();
+    }
+
+    private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<Account> doInBackground(Void... voids) {
+            List<Account> accountList = null;
+            try {
+                accountList = db.getAccountDAO().findAllAccount();
+            }  catch (Exception e) {
+                mException = e;
+            }
+            return accountList;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... voids)
+        {
+            super.onProgressUpdate(voids);
+        }
+
+        @Override
+        protected void onPostExecute(List<Account> result)
+        {
+            super.onPostExecute(result);
+            if(mException == null){
+                list = result;
+                adapter = new AccountAdapter(list);
+                mRecyclerView.setAdapter(adapter);
+            } else {
+                Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     public void onButtonPressed(Uri uri) {

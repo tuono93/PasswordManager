@@ -412,7 +412,9 @@ public class CheckPwdFragment extends Fragment {
 
     public void passwordEsatta(boolean viewSnack) {
         Intent toMain = new Intent(getActivity(), MainActivity.class);
-        toMain.putExtra("view_snack",viewSnack);
+        if(viewSnack) {
+            toMain.putExtra("view_snack", getString(R.string.newPasscode));
+        }
         startActivity(toMain);
         getActivity().finish();
     }

@@ -9,6 +9,10 @@
     <string name="list_account_string">Account</string>
     <string name="cambia_pwd_string">Cambia Password</string>
     <string name="esci">Esci</string>
+    <string name="newPasscode">Nuovo Passcode salvato</string>
+    <string name="newAccount">Nuovo Account inserito</string>
+
+
 
 
     <!-- TODO: Remove or change this placeholder text -->

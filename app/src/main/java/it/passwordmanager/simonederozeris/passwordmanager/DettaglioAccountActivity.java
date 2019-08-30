@@ -142,10 +142,6 @@ public class DettaglioAccountActivity extends AppCompatActivity {
             super.onPostExecute(result);
             if(mException == null){
                 for (Account account : result) {
-                    Log.i("ACCOUNT ", "ID ACCOUNT: " + account.getId());
-                    Log.i("ACCOUNT ", "NOME ACCOUNT: " + account.getNome());
-                    Log.i("ACCOUNT ", "PASSWORD ACCOUNT: " + account.getPassword());
-                    Log.i("ACCOUNT ", "NOTE ACCOUNT: " + account.getNota());
                     MainActivity.stringSnackStatic = getString(R.string.newAccount);
                     activity.finish();
                 }

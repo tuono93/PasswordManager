@@ -6,6 +6,8 @@
     android:icon="@drawable/save_36"
     android:title="Salva Account"
     app:showAsAction="always"
+    android:clickable="true"
+    android:background="@drawable/custom_ripple"
     >
 </item>
 </menu>

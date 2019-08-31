@@ -31,6 +31,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     PasswordManagerDatabase db;
     Exception mException = null;
     DettaglioAccountActivity activity;
+    String action = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,16 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.autoCompleteNomeAccount);
         actv.setThreshold(1);//will start working from first character
         actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
+
+        //TODO: DA RIFARE
+        String id = getIntent().getStringExtra("id");
+        if(id != null && !id.equals("")){
+            String nome = getIntent().getStringExtra("nome");
+            String password = getIntent().getStringExtra("password");
+            String note = getIntent().getStringExtra("note");
+
+        };
+
     }
 
     @Override

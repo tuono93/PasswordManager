@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -125,6 +126,18 @@ public class AccountListFragment extends Fragment {
             if(mException == null){
                 list = result;
                 adapter = new AccountAdapter(list);
+                adapter.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
+                    @Override
+                    public void onAccountClicked(Account account, int position) {
+                        Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
+                        toMain.putExtra("action","U");
+                        toMain.putExtra("id",account.getId());
+                        toMain.putExtra("name",account.getNome());
+                        toMain.putExtra("password",account.getPassword());
+                        toMain.putExtra("note",account.getNota());
+                        startActivity(toMain);
+                    }
+                });
                 mRecyclerView.setAdapter(adapter);
             } else {
                 Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
@@ -145,6 +158,7 @@ public class AccountListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
+                toMain.putExtra("action","I");
                 startActivity(toMain);
             }
         });

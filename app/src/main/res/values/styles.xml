@@ -13,6 +13,12 @@
         <item name="android:windowBackground">@drawable/background</item>
     </style>
 
+    <style name="ToolbarStyle" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="android:colorControlHighlight">@color/verylightGrey</item>
+    </style>
+
+
 
     <style name="editTextPwd">
         <item name="android:layout_width">0dp</item>
@@ -41,5 +47,9 @@
     <style name="AppThemeNoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppThemeNoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MyToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="colorControlHighlight">@color/colorAccent</item>
+    </style>
 
 </resources>

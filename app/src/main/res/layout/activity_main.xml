@@ -21,8 +21,8 @@
                 android:paddingLeft="0dp"
                 android:paddingRight="0dp"
                 android:gravity="center"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar"
+                android:theme="@style/ToolbarStyle"
+                app:popupTheme="@style/ToolbarStyle"
                 app:contentInsetLeft="0dp"
                 app:contentInsetStart="0dp"
                 app:contentInsetStartWithNavigation="0dp">
@@ -55,6 +55,7 @@
             android:layout_gravity="start"
             android:background="@color/darkLightGrey"
             app:headerLayout="@layout/header_nav"
+            app:itemBackground="@drawable/custom_ripple_nav"
             >
         </com.google.android.material.navigation.NavigationView>
     </androidx.drawerlayout.widget.DrawerLayout>

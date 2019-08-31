@@ -3,6 +3,8 @@
     <color name="customRed">#D32F2F</color>
     <color name="verylightGrey">#FAFAFA</color>
     <color name="lightGrey">#BDBDBD</color>
+    <color name="lightBlack">#424242</color>
+    <color name="lightlightBlack">#616161</color>
     <color name="darkLightGrey">#9E9E9E</color>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>

@@ -17,11 +17,11 @@
         android:gravity="center"
         android:paddingLeft="0dp"
         android:paddingRight="0dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:theme="@style/ToolbarStyle"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
         app:contentInsetStartWithNavigation="0dp"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.ActionBar">
+        app:popupTheme="@style/ToolbarStyle">
 
         <TextView
             android:id="@+id/toolbar_title"

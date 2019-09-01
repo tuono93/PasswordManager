@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +44,8 @@ public class AccountListFragment extends Fragment {
     PasswordManagerDatabase db;
     Exception mException = null;
     List<Account> list;
+    private String nome,password,note;
+    private int id;
 
     private OnFragmentInteractionListener mListener;
 
@@ -129,13 +132,23 @@ public class AccountListFragment extends Fragment {
                 adapter.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
                     @Override
                     public void onAccountClicked(Account account, int position) {
-                        Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
-                        toMain.putExtra("action","U");
-                        toMain.putExtra("id",account.getId());
-                        toMain.putExtra("name",account.getNome());
-                        toMain.putExtra("password",account.getPassword());
-                        toMain.putExtra("note",account.getNota());
-                        startActivity(toMain);
+                        id = account.getId();
+                        nome = account.getNome();
+                        password = account.getPassword();
+                        note = account.getNota();
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
+                                toMain.putExtra("action",Action.UPDATE.getAction());
+                                toMain.putExtra("id",id);
+                                toMain.putExtra("nome",nome);
+                                toMain.putExtra("password",password);
+                                toMain.putExtra("note",note);
+                                startActivity(toMain); //perform Task
+                            }
+                        }, 70);
                     }
                 });
                 mRecyclerView.setAdapter(adapter);
@@ -158,7 +171,7 @@ public class AccountListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
-                toMain.putExtra("action","I");
+                toMain.putExtra("action",Action.INSERT.getAction());
                 startActivity(toMain);
             }
         });

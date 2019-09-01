@@ -3,6 +3,7 @@ package it.passwordmanager.simonederozeris.passwordmanager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -31,7 +32,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     PasswordManagerDatabase db;
     Exception mException = null;
     DettaglioAccountActivity activity;
-    String action = "";
+    Action action;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +53,19 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         actv.setThreshold(1);//will start working from first character
         actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
 
-        //TODO: DA RIFARE
-        String id = getIntent().getStringExtra("id");
-        if(id != null && !id.equals("")){
+        EditText editPassword = findViewById(R.id.key_text);
+        EditText editNote = findViewById(R.id.note_text);
+
+        action = Action.getEnumStatoGestione(getIntent().getStringExtra("action"));
+        if(action == Action.UPDATE){
             String nome = getIntent().getStringExtra("nome");
             String password = getIntent().getStringExtra("password");
             String note = getIntent().getStringExtra("note");
 
+            actv.setText(nome);
+            editPassword.setText(password);
+            editNote.setText(note);
         };
-
     }
 
     @Override
@@ -73,24 +78,41 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        activity.finish();
+                    }
+                }, 100);
                 break;
             case R.id.saveAccount:
-                AutoCompleteTextView nomeAccountAtv  = findViewById(R.id.autoCompleteNomeAccount);
-                EditText passwordEt  = findViewById(R.id.key_text);
-                EditText noteEt  = findViewById(R.id.note_text);
-                String nomeAccount = nomeAccountAtv != null ? nomeAccountAtv.getText().toString().trim() : null;
-                String password = passwordEt != null ? passwordEt.getText().toString().trim() : null;
-                String note = noteEt != null ? noteEt.getText().toString().trim() : null;
 
-                String error = checkTextinput(nomeAccount,password,note);
-                if(error.equals("")){
-                    Account account = new Account(nomeAccount,password,note);
-                    db = PasswordManagerDatabase.getDatabase(this);
-                    insertAccountDB(account);
-                } else {
-                    Toast.makeText(activity,error,Toast.LENGTH_LONG).show();
-                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        AutoCompleteTextView nomeAccountAtv  = findViewById(R.id.autoCompleteNomeAccount);
+                        EditText passwordEt  = findViewById(R.id.key_text);
+                        EditText noteEt  = findViewById(R.id.note_text);
+                        String nomeAccount = nomeAccountAtv != null ? nomeAccountAtv.getText().toString().trim() : null;
+                        String password = passwordEt != null ? passwordEt.getText().toString().trim() : null;
+                        String note = noteEt != null ? noteEt.getText().toString().trim() : null;
+
+                        String error = checkTextinput(nomeAccount,password,note);
+                        if(error.equals("")){
+                            if (action == Action.INSERT){
+                                Account account = new Account(nomeAccount,password,note);
+                                db = PasswordManagerDatabase.getDatabase(activity);
+                                insertAccountDB(account);
+                            } else {
+                                Account account = new Account(nomeAccount,password,note);
+                                db = PasswordManagerDatabase.getDatabase(activity);
+                                updateAccountDB(account);
+                            }
+                        } else {
+                            Toast.makeText(activity,error,Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }, 100);
                 break;
             default:
                 break;
@@ -109,6 +131,11 @@ public class DettaglioAccountActivity extends AppCompatActivity {
 
         return error;
     }
+
+    public void updateAccountDB(Account account){
+
+    }
+
 
     public void insertAccountDB(Account account){
         mException = null;

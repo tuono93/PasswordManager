@@ -35,6 +35,8 @@ public class AccountViewHolder extends RecyclerView.ViewHolder implements View.O
     }
 
     public void bind (Account account){
+        int idKey = itemView.getResources().getIdentifier("account_key", "drawable", "it.passwordmanager.simonederozeris.passwordmanager");
+        imageAccount.setImageResource(idKey);
         textAccount.setText(account.getNome().trim());
         int id = itemView.getResources().getIdentifier(account.getNome().trim().toLowerCase(), "drawable", "it.passwordmanager.simonederozeris.passwordmanager");
         if(id!=0) {

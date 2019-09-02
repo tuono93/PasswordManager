@@ -33,6 +33,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     Exception mException = null;
     DettaglioAccountActivity activity;
     Action action;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
             String nome = getIntent().getStringExtra("nome");
             String password = getIntent().getStringExtra("password");
             String note = getIntent().getStringExtra("note");
+            id = getIntent().getIntExtra("id",0);
 
             actv.setText(nome);
             editPassword.setText(password);
@@ -102,11 +104,12 @@ public class DettaglioAccountActivity extends AppCompatActivity {
                             if (action == Action.INSERT){
                                 Account account = new Account(nomeAccount,password,note);
                                 db = PasswordManagerDatabase.getDatabase(activity);
-                                insertAccountDB(account);
+                                insertUpdateAccountDB(account,true);
                             } else {
                                 Account account = new Account(nomeAccount,password,note);
+                                account.setId(id);
                                 db = PasswordManagerDatabase.getDatabase(activity);
-                                updateAccountDB(account);
+                                insertUpdateAccountDB(account,false);
                             }
                         } else {
                             Toast.makeText(activity,error,Toast.LENGTH_SHORT).show();
@@ -132,23 +135,20 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         return error;
     }
 
-    public void updateAccountDB(Account account){
-
-    }
-
-
-    public void insertAccountDB(Account account){
+    public void insertUpdateAccountDB(Account account,boolean insert){
         mException = null;
-        new ReadDBAsync(account).execute();
+        new ReadDBAsync(account,insert).execute();
         db.destroyInstance();
     }
 
-    private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>> {
+    private class ReadDBAsync extends AsyncTask<Void,Void,Void>{
 
         private Account account;
+        private boolean insert;
 
-        ReadDBAsync(Account account){
+        ReadDBAsync(Account account,boolean insert){
             this.account = account;
+            this.insert = insert;
         }
 
         @Override
@@ -157,15 +157,19 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         }
 
         @Override
-        protected List<Account> doInBackground(Void... inputs) {
+        protected Void doInBackground(Void... inputs) {
             List<Account> accountList = null;
             try {
-                db.getAccountDAO().insertAccount(this.account);
-                accountList = db.getAccountDAO().findAllAccount();
+                if(insert) {
+                    db.getAccountDAO().insertAccount(this.account);
+                } else {
+                    db.getAccountDAO().updateAccount(this.account);
+                }
             }  catch (Exception e) {
                 mException = e;
             }
-            return accountList;
+
+            return null;
         }
 
         @Override
@@ -175,14 +179,12 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<Account> result)
+        protected void onPostExecute(Void voidParm)
         {
-            super.onPostExecute(result);
+            super.onPostExecute(voidParm);
             if(mException == null){
-                for (Account account : result) {
                     MainActivity.stringSnackStatic = getString(R.string.newAccount);
                     activity.finish();
-                }
             } else {
                 Toast.makeText(activity,mException.getMessage(),Toast.LENGTH_LONG).show();
             }

@@ -13,14 +13,15 @@ import java.lang.ref.WeakReference;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 
-public class AccountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+public class AccountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
     private ImageView imageAccount;
     private TextView textAccount;
     private WeakReference<OnItemClickListener> onItemClickListenerRef;
 
     public interface OnItemClickListener{
-        void onItemClicked(int position);
+        void onItemClicked(int position,View v);
+        void onItemLongClicked(int position,View v);
     }
 
     public AccountViewHolder(View itemView){
@@ -28,6 +29,7 @@ public class AccountViewHolder extends RecyclerView.ViewHolder implements View.O
         imageAccount = itemView.findViewById(R.id.imageItem);
         textAccount = itemView.findViewById(R.id.textItem);
         itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
     }
 
     public void setOnItemClickListener(final OnItemClickListener onItemClickListener){
@@ -48,7 +50,32 @@ public class AccountViewHolder extends RecyclerView.ViewHolder implements View.O
     public void onClick(View v){
         OnItemClickListener listener;
         if(onItemClickListenerRef != null && (listener = onItemClickListenerRef.get()) != null){
-            listener.onItemClicked(getLayoutPosition());
+            listener.onItemClicked(getLayoutPosition(),v);
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        OnItemClickListener listener;
+        if(onItemClickListenerRef != null && (listener = onItemClickListenerRef.get()) != null){
+            listener.onItemLongClicked(getLayoutPosition(),v);
+        }
+        return true;
+    }
+
+    public ImageView getImageAccount() {
+        return imageAccount;
+    }
+
+    public void setImageAccount(ImageView imageAccount) {
+        this.imageAccount = imageAccount;
+    }
+
+    public TextView getTextAccount() {
+        return textAccount;
+    }
+
+    public void setTextAccount(TextView textAccount) {
+        this.textAccount = textAccount;
     }
 }

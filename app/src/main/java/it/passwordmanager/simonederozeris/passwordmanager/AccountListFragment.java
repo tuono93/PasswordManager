@@ -41,6 +41,9 @@ public class AccountListFragment extends Fragment {
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
     private AccountAdapter adapter;
+    private AccountAdapter adapterlongClick;
+    private AccountListFragment fragment;
+
     PasswordManagerDatabase db;
     Exception mException = null;
     List<Account> list;
@@ -68,6 +71,7 @@ public class AccountListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fragment = this;
     }
 
     @Override
@@ -131,7 +135,7 @@ public class AccountListFragment extends Fragment {
                 adapter = new AccountAdapter(list);
                 adapter.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
                     @Override
-                    public void onAccountClicked(Account account, int position) {
+                    public void onAccountClicked(Account account, int position, View v) {
                         id = account.getId();
                         nome = account.getNome();
                         password = account.getPassword();
@@ -149,6 +153,42 @@ public class AccountListFragment extends Fragment {
                                 startActivity(toMain); //perform Task
                             }
                         }, 70);
+                    }
+
+                    @Override
+                    public void onAccountLongClicked(Account account, int position, View v) {
+                        id = account.getId();
+                        nome = account.getNome();
+                        password = account.getPassword();
+                        note = account.getNota();
+
+                        Log.i("LONG","" + id);
+                        Log.i("LONG","" + nome);
+                        Log.i("LONG","" + password);
+                        Log.i("LONG","" + note);
+
+                        adapterlongClick = new AccountAdapter(list,position,fragment);
+                        adapterlongClick.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
+                            @Override
+                            public void onAccountClicked(Account account, int position,View v) {
+                                id = account.getId();
+                                nome = account.getNome();
+                                password = account.getPassword();
+                                note = account.getNota();
+                                v.setBackgroundColor(getResources().getColor(R.color.darkLightGrey));
+                                Log.i("SHORT","" + id);
+                                Log.i("SHORT","" + nome);
+                                Log.i("SHORT","" + password);
+                                Log.i("SHORT","" + note);
+                            }
+
+                            @Override
+                            public void onAccountLongClicked(Account account, int position, View v) {
+                                v.setBackgroundColor(getResources().getColor(R.color.darkLightGrey));
+                            }
+                        });
+
+                        mRecyclerView.setAdapter(adapterlongClick);
                     }
                 });
                 mRecyclerView.setAdapter(adapter);

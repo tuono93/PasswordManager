@@ -1,23 +1,30 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 
-public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> implements AccountViewHolder.OnItemClickListener {
+public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> implements AccountViewHolder.OnItemClickListener{
 
     private List<Account> mModel;
+    private int position;
+    private Fragment frag;
 
     private WeakReference<onAccountListener> onAccountListenerRef;
 
     public interface onAccountListener{
-        void onAccountClicked(Account account, int position);
+        void onAccountClicked(Account account, int position,View v);
+        void onAccountLongClicked(Account account, int position,View v);
     }
 
     public void setOnAccountClickListener(final onAccountListener onAccountListener){
@@ -26,6 +33,12 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> impl
 
     public AccountAdapter(final List<Account> model) {
         this.mModel = model;
+    }
+
+    public AccountAdapter(final List<Account> model, int position, Fragment frag) {
+        this.mModel = model;
+        this.position = position;
+        this.frag = frag;
     }
 
     @NonNull
@@ -38,6 +51,11 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> impl
     @Override
     public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
         holder.bind(mModel.get(position));
+        if(frag != null && position == this.position){
+            View v = (View)holder.getTextAccount().getParent();
+            v.setBackgroundColor(frag.getResources().getColor(R.color.darkLightGrey));
+        }
+
         holder.setOnItemClickListener(this);
     }
 
@@ -47,10 +65,18 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> impl
     }
 
     @Override
-    public void onItemClicked(int position) {
+    public void onItemClicked(int position,View v) {
         onAccountListener listener;
         if(onAccountListenerRef != null && (listener = onAccountListenerRef.get()) != null){
-            listener.onAccountClicked(mModel.get(position),position);
+            listener.onAccountClicked(mModel.get(position),position,v);
+        }
+    }
+
+    @Override
+    public void onItemLongClicked(int position,View v) {
+        onAccountListener listener;
+        if(onAccountListenerRef != null && (listener = onAccountListenerRef.get()) != null){
+            listener.onAccountLongClicked(mModel.get(position),position,v);
         }
     }
 }

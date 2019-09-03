@@ -17,6 +17,7 @@ public class AccountViewHolder extends RecyclerView.ViewHolder implements View.O
 
     private ImageView imageAccount;
     private TextView textAccount;
+    private View itemView;
     private WeakReference<OnItemClickListener> onItemClickListenerRef;
 
     public interface OnItemClickListener{
@@ -26,8 +27,9 @@ public class AccountViewHolder extends RecyclerView.ViewHolder implements View.O
 
     public AccountViewHolder(View itemView){
         super(itemView);
-        imageAccount = itemView.findViewById(R.id.imageItem);
-        textAccount = itemView.findViewById(R.id.textItem);
+        this.itemView = itemView;
+        this.imageAccount = itemView.findViewById(R.id.imageItem);
+        this.textAccount = itemView.findViewById(R.id.textItem);
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
     }
@@ -77,5 +79,13 @@ public class AccountViewHolder extends RecyclerView.ViewHolder implements View.O
 
     public void setTextAccount(TextView textAccount) {
         this.textAccount = textAccount;
+    }
+
+    public View getItemView() {
+        return itemView;
+    }
+
+    public void setItemView(View itemView) {
+        this.itemView = itemView;
     }
 }

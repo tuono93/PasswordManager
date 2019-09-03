@@ -1,6 +1,7 @@
 package it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -12,6 +13,8 @@ public class Account {
     private String nome;
     private String password;
     private String nota;
+    @Ignore
+    private boolean selected;
 
     public Account(String nome, String password, String nota) {
         this.nome = nome;
@@ -49,5 +52,13 @@ public class Account {
 
     public void setNota(String nota) {
         this.nota = nota;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

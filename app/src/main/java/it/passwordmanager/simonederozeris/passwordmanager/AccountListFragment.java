@@ -132,7 +132,7 @@ public class AccountListFragment extends Fragment {
             super.onPostExecute(result);
             if(mException == null){
                 list = result;
-                adapter = new AccountAdapter(list);
+                adapter = new AccountAdapter(list,fragment);
                 adapter.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
                     @Override
                     public void onAccountClicked(Account account, int position, View v) {
@@ -167,7 +167,10 @@ public class AccountListFragment extends Fragment {
                         Log.i("LONG","" + password);
                         Log.i("LONG","" + note);
 
-                        adapterlongClick = new AccountAdapter(list,position,fragment);
+                        account.setSelected(true);
+                        adapter.notifyDataSetChanged();
+
+                        adapterlongClick = new AccountAdapter(list,fragment);
                         adapterlongClick.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
                             @Override
                             public void onAccountClicked(Account account, int position,View v) {
@@ -175,7 +178,10 @@ public class AccountListFragment extends Fragment {
                                 nome = account.getNome();
                                 password = account.getPassword();
                                 note = account.getNota();
-                                v.setBackgroundColor(getResources().getColor(R.color.darkLightGrey));
+
+                                account.setSelected(true);
+                                adapterlongClick.notifyDataSetChanged();
+
                                 Log.i("SHORT","" + id);
                                 Log.i("SHORT","" + nome);
                                 Log.i("SHORT","" + password);
@@ -184,8 +190,8 @@ public class AccountListFragment extends Fragment {
 
                             @Override
                             public void onAccountLongClicked(Account account, int position, View v) {
-                                v.setBackgroundColor(getResources().getColor(R.color.darkLightGrey));
-                            }
+                                account.setSelected(true);
+                                adapterlongClick.notifyDataSetChanged();                            }
                         });
 
                         mRecyclerView.setAdapter(adapterlongClick);

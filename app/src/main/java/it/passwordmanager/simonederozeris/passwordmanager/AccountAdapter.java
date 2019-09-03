@@ -17,7 +17,6 @@ import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.sim
 public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> implements AccountViewHolder.OnItemClickListener{
 
     private List<Account> mModel;
-    private int position;
     private Fragment frag;
 
     private WeakReference<onAccountListener> onAccountListenerRef;
@@ -31,13 +30,8 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> impl
         this.onAccountListenerRef = new WeakReference<onAccountListener>(onAccountListener);
     }
 
-    public AccountAdapter(final List<Account> model) {
+    public AccountAdapter(final List<Account> model, Fragment frag) {
         this.mModel = model;
-    }
-
-    public AccountAdapter(final List<Account> model, int position, Fragment frag) {
-        this.mModel = model;
-        this.position = position;
         this.frag = frag;
     }
 
@@ -51,11 +45,11 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountViewHolder> impl
     @Override
     public void onBindViewHolder(@NonNull AccountViewHolder holder, int position) {
         holder.bind(mModel.get(position));
-        if(frag != null && position == this.position){
-            View v = (View)holder.getTextAccount().getParent();
-            v.setBackgroundColor(frag.getResources().getColor(R.color.darkLightGrey));
+        if(mModel.get(position).isSelected()) {
+            holder.getItemView().setBackgroundColor(frag.getResources().getColor(R.color.darkLightGrey));
+        } else {
+            holder.getItemView().setBackground(frag.getResources().getDrawable(R.drawable.ripple));
         }
-
         holder.setOnItemClickListener(this);
     }
 

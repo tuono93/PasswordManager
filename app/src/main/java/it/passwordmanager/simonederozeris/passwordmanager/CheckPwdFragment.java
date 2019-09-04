@@ -52,19 +52,12 @@ public class CheckPwdFragment extends Fragment {
     private static final String ARG_VALUE = "value";
 
 
-
     public EditText editTextPwd1, editTextPwd2, editTextPwd3, editTextPwd4;
     public LinearLayout linearLayoutPwd;
     public TextView textPwd;
     Animation animationPwd;
-
     SharedPreferences sharedPreferences;
 
-
-
-
-
-    // TODO: Rename and change types of parameters
     private Flusso flusso;
     private TipoStatoPwd stato;
     private int layout_container;

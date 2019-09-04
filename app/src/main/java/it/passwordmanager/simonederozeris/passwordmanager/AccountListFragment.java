@@ -15,16 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.OnBackPressed;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 
@@ -36,19 +42,24 @@ import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.sim
  * Use the {@link AccountListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountListFragment extends Fragment {
+public class AccountListFragment extends Fragment implements OnBackPressed {
 
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
     private AccountAdapter adapter;
     private AccountAdapter adapterlongClick;
     private AccountListFragment fragment;
+    public boolean longClickState = false;
+    public int positionScroll = 0;
+    private MainActivity mainActivity;
+    private int countSelect = 0;
 
     PasswordManagerDatabase db;
     Exception mException = null;
     List<Account> list;
     private String nome,password,note;
     private int id;
+    TextView textTitle;
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,12 +88,13 @@ public class AccountListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        textTitle = mainActivity.toolbar.findViewById(R.id.toolbar_title);
         View rootView = inflater.inflate(R.layout.fragment_account_list, container, false);
         fab = (FloatingActionButton) rootView.findViewById(R.id.fabNewAccount);
         mRecyclerView = rootView.findViewById(R.id.listAccount);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(RecyclerView.VERTICAL);
-        layoutManager.scrollToPosition(0);
+        layoutManager.scrollToPosition(positionScroll);
         LineItemDecoration lineItemDecoration = new LineItemDecoration();
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(lineItemDecoration);
@@ -101,6 +113,148 @@ public class AccountListFragment extends Fragment {
         new ReadDBAsync().execute();
         db.destroyInstance();
     }
+
+    public void backFromLongClick(){
+        longClickState = false;
+        for (Account account : list){
+            account.setSelected(false);
+        }
+        setInitialAdapter(adapter);
+        mRecyclerView.setAdapter(adapter);
+        ((LinearLayoutManager)mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
+
+        countSelect = 0;
+        textTitle.setText(R.string.app_name);
+
+        mainActivity.optionsMenu.getItem(0).setVisible(false);
+        mainActivity.toolbar.setNavigationIcon(R.drawable.menu_button2);
+        mainActivity.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mainActivity.drawerLayout.openDrawer(Gravity.LEFT);
+                    }
+                }, 200);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(longClickState){
+            backFromLongClick();
+        } else {
+            getActivity().finish();
+        }
+    }
+
+    private void updateTitleLongClick(boolean moreCount){
+        if (moreCount){
+            countSelect++;
+        } else {
+            countSelect--;
+        }
+
+        if (countSelect == 0){
+            backFromLongClick();
+        } else {
+            String title = countSelect == 1 ? countSelect + " account selezionato" : countSelect + " account selezionati";
+            textTitle.setText(title);
+        }
+    }
+
+    private void setInitialAdapter(final AccountAdapter adapter){
+        adapter.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
+            @Override
+            public void onAccountClicked(Account account, int position, View v) {
+                id = account.getId();
+                nome = account.getNome();
+                password = account.getPassword();
+                note = account.getNota();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
+                        toMain.putExtra("action",Action.UPDATE.getAction());
+                        toMain.putExtra("id",id);
+                        toMain.putExtra("nome",nome);
+                        toMain.putExtra("password",password);
+                        toMain.putExtra("note",note);
+                        startActivity(toMain); //perform Task
+                    }
+                }, 70);
+            }
+
+            @Override
+            public void onAccountLongClicked(Account account, int position, View v) {
+                id = account.getId();
+                nome = account.getNome();
+                password = account.getPassword();
+                note = account.getNota();
+
+                positionScroll = ((LinearLayoutManager)mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
+                account.setSelected(true);
+                adapter.notifyDataSetChanged();
+                updateTitleLongClick(true);
+
+                longClickState = true;
+
+                mainActivity.toolbar.setNavigationIcon(R.drawable.back);
+                mainActivity.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                backFromLongClick();
+                            }
+                        }, 200);
+                    }
+                });
+                mainActivity.optionsMenu.getItem(0).setVisible(true);
+
+                adapterlongClick = new AccountAdapter(list,fragment);
+                adapterlongClick.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
+                    @Override
+                    public void onAccountClicked(Account account, int position,View v) {
+                        id = account.getId();
+                        nome = account.getNome();
+                        password = account.getPassword();
+                        note = account.getNota();
+
+                        if(account.isSelected()){
+                            account.setSelected(false);
+                            updateTitleLongClick(false);
+                        } else {
+                            account.setSelected(true);
+                            updateTitleLongClick(true);
+                        }
+                        adapterlongClick.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onAccountLongClicked(Account account, int position, View v) {
+                        if(account.isSelected()){
+                            account.setSelected(false);
+                            updateTitleLongClick(false);
+                        } else {
+                            account.setSelected(true);
+                            updateTitleLongClick(true);
+                        }
+                        adapterlongClick.notifyDataSetChanged();
+                    }
+                });
+
+                mRecyclerView.setAdapter(adapterlongClick);
+                ((LinearLayoutManager)mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
+            }
+        });
+    }
+
 
     private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>> {
 
@@ -133,70 +287,7 @@ public class AccountListFragment extends Fragment {
             if(mException == null){
                 list = result;
                 adapter = new AccountAdapter(list,fragment);
-                adapter.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
-                    @Override
-                    public void onAccountClicked(Account account, int position, View v) {
-                        id = account.getId();
-                        nome = account.getNome();
-                        password = account.getPassword();
-                        note = account.getNota();
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
-                                toMain.putExtra("action",Action.UPDATE.getAction());
-                                toMain.putExtra("id",id);
-                                toMain.putExtra("nome",nome);
-                                toMain.putExtra("password",password);
-                                toMain.putExtra("note",note);
-                                startActivity(toMain); //perform Task
-                            }
-                        }, 70);
-                    }
-
-                    @Override
-                    public void onAccountLongClicked(Account account, int position, View v) {
-                        id = account.getId();
-                        nome = account.getNome();
-                        password = account.getPassword();
-                        note = account.getNota();
-
-                        Log.i("LONG","" + id);
-                        Log.i("LONG","" + nome);
-                        Log.i("LONG","" + password);
-                        Log.i("LONG","" + note);
-
-                        account.setSelected(true);
-                        adapter.notifyDataSetChanged();
-
-                        adapterlongClick = new AccountAdapter(list,fragment);
-                        adapterlongClick.setOnAccountClickListener(new AccountAdapter.onAccountListener() {
-                            @Override
-                            public void onAccountClicked(Account account, int position,View v) {
-                                id = account.getId();
-                                nome = account.getNome();
-                                password = account.getPassword();
-                                note = account.getNota();
-
-                                account.setSelected(true);
-                                adapterlongClick.notifyDataSetChanged();
-
-                                Log.i("SHORT","" + id);
-                                Log.i("SHORT","" + nome);
-                                Log.i("SHORT","" + password);
-                                Log.i("SHORT","" + note);
-                            }
-
-                            @Override
-                            public void onAccountLongClicked(Account account, int position, View v) {
-                                account.setSelected(true);
-                                adapterlongClick.notifyDataSetChanged();                            }
-                        });
-
-                        mRecyclerView.setAdapter(adapterlongClick);
-                    }
-                });
+                setInitialAdapter(adapter);
                 mRecyclerView.setAdapter(adapter);
             } else {
                 Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
@@ -226,6 +317,7 @@ public class AccountListFragment extends Fragment {
     @Override
     public void onAttach(Activity activity){
         super.onAttach(activity);
+        mainActivity = (MainActivity)activity;
     }
 
     @Override

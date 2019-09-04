@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     NavigationView navigationView;
     MainActivity mainActivity;
     static String stringSnackStatic = "";
-
+    public Menu optionsMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_toolbar_main_long_click,menu);
+        menu.getItem(0).setVisible(false);
+        optionsMenu = menu;
         return true;
     }
 
@@ -113,11 +116,18 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         drawerLayout.openDrawer(Gravity.LEFT);
+                    }
+                }, 200);
+                break;
+            case R.id.eliminaAccount:
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mainActivity,"elimina account",Toast.LENGTH_LONG).show();
                     }
                 }, 200);
                 break;
@@ -140,5 +150,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!tellFragments()){
+            super.onBackPressed();
+        }
+    }
+
+    private boolean tellFragments(){
+        boolean manageFromFragment = false;
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for(Fragment f : fragments) {
+            if (f != null && f.getClass().getName().equals(AccountListFragment.class.getName())) {
+                manageFromFragment = true;
+                ((AccountListFragment) f).onBackPressed();
+            }
+        }
+
+        return manageFromFragment;
     }
 }

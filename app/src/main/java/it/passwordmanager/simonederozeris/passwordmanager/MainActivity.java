@@ -9,6 +9,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -19,6 +20,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.List;
@@ -103,12 +105,66 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void setSearchListener(){
+        MenuItem searchItem = mainActivity.optionsMenu.getItem(1);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        SearchView.SearchAutoComplete searchAutoComplete =
+                (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchAutoComplete.setHintTextColor(getColor(R.color.Gray));
+        searchAutoComplete.setTextColor(getColor(R.color.White));
+        ImageView searchIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_button);
+        searchIcon.setImageDrawable(getDrawable(R.drawable.search));
+
+        ImageView searchCloseIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        searchCloseIcon.setImageDrawable(getDrawable(R.drawable.close));
+
+        if(searchItem != null){
+            searchView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("SEARCH_VIEW","Search clicked");
+                }
+            });
+
+            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    Log.d("SEARCH_VIEW","Search closed");
+                    return false;
+                }
+            });
+
+            searchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("SEARCH_VIEW","Search Click");
+                }
+            });
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Log.d("SEARCH_VIEW","Query Text Submit! " + query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    Log.d("SEARCH_VIEW","Query Text Changed! " + newText);
+                    return false;
+                }
+            });
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_toolbar_main_long_click,menu);
         menu.getItem(0).setVisible(false);
         optionsMenu = menu;
+        setSearchListener();
         return true;
     }
 
@@ -128,6 +184,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(mainActivity,"elimina account",Toast.LENGTH_LONG).show();
+                    }
+                }, 200);
+                break;
+            case R.id.cercaAccount:
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
                     }
                 }, 200);
                 break;

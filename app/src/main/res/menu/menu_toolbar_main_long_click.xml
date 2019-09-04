@@ -10,4 +10,14 @@
         android:background="@drawable/custom_ripple"
         >
     </item>
+    <item
+        android:id = "@+id/cercaAccount"
+        android:icon="@drawable/search"
+        android:title="Cerca Account"
+        app:showAsAction="always"
+        android:clickable="true"
+        android:background="@drawable/custom_ripple"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        >
+    </item>
 </menu>

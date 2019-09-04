@@ -127,6 +127,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
         textTitle.setText(R.string.app_name);
 
         mainActivity.optionsMenu.getItem(0).setVisible(false);
+        mainActivity.optionsMenu.getItem(1).setVisible(true);
+
         mainActivity.toolbar.setNavigationIcon(R.drawable.menu_button2);
         mainActivity.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -216,6 +218,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
                     }
                 });
                 mainActivity.optionsMenu.getItem(0).setVisible(true);
+                mainActivity.optionsMenu.getItem(1).setVisible(false);
+
 
                 adapterlongClick = new AccountAdapter(list,fragment);
                 adapterlongClick.setOnAccountClickListener(new AccountAdapter.onAccountListener() {

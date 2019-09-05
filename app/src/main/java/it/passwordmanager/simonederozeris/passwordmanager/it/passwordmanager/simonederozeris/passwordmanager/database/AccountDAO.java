@@ -14,6 +14,9 @@ public interface AccountDAO {
     @Query("SELECT * FROM account WHERE id = :id")
     public Account findById(int id);
 
+    @Query("SELECT * FROM account WHERE nome LIKE :nome")
+    public List<Account> findByName(String nome);
+
     @Query("SELECT * FROM account")
     public List<Account> findAllAccount();
 

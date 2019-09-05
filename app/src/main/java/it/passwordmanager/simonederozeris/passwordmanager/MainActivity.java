@@ -1,19 +1,14 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -105,59 +100,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setSearchListener(){
-        MenuItem searchItem = mainActivity.optionsMenu.getItem(1);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-
-        SearchView.SearchAutoComplete searchAutoComplete =
-                (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setHintTextColor(getColor(R.color.Gray));
-        searchAutoComplete.setTextColor(getColor(R.color.White));
-        ImageView searchIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_button);
-        searchIcon.setImageDrawable(getDrawable(R.drawable.search));
-
-        ImageView searchCloseIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
-        searchCloseIcon.setImageDrawable(getDrawable(R.drawable.close));
-
-        if(searchItem != null){
-            searchView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("SEARCH_VIEW","Search clicked");
-                }
-            });
-
-            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-                @Override
-                public boolean onClose() {
-                    Log.d("SEARCH_VIEW","Search closed");
-                    return false;
-                }
-            });
-
-            searchView.setOnSearchClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("SEARCH_VIEW","Search Click");
-                }
-            });
-
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    Log.d("SEARCH_VIEW","Query Text Submit! " + query);
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    Log.d("SEARCH_VIEW","Query Text Changed! " + newText);
-                    return false;
-                }
-            });
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
@@ -223,4 +165,66 @@ public class MainActivity extends AppCompatActivity {
 
         return manageFromFragment;
     }
+
+    public void setSearchListener(){
+        MenuItem searchItem = mainActivity.optionsMenu.getItem(1);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        SearchView.SearchAutoComplete searchAutoComplete =
+                (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchAutoComplete.setHintTextColor(getColor(R.color.Gray));
+        searchAutoComplete.setTextColor(getColor(R.color.White));
+        ImageView searchIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_button);
+        searchIcon.setImageDrawable(getDrawable(R.drawable.search));
+
+        ImageView searchCloseIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        searchCloseIcon.setImageDrawable(getDrawable(R.drawable.close));
+
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for(Fragment f : fragments) {
+            if (f != null && f.getClass().getName().equals(AccountListFragment.class.getName())) {
+                    final AccountListFragment fragList = ((AccountListFragment) f);
+                    searchView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d("SEARCH_VIEW","Search clicked");
+                        }
+                    });
+
+                    searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                        @Override
+                        public boolean onClose() {
+                            Log.d("SEARCH_VIEW","Search closed");
+                            fragList.onSearchClose();
+                            return false;
+                        }
+                    });
+
+                    searchView.setOnSearchClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            fragList.onSearchOpen();
+                            Log.d("SEARCH_VIEW","Search Click");
+                        }
+                    });
+
+                    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            //searchItem.collapseActionView();
+                            Log.d("SEARCH_VIEW","Query Text Submit! " + query);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            Log.d("SEARCH_VIEW","Query Text Changed! " + newText);
+                            fragList.onSearchQueryChange(newText+"%");
+                            return false;
+                        }
+                    });
+            }
+        }
+    }
+
 }

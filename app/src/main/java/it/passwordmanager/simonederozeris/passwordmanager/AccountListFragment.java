@@ -1,7 +1,6 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,31 +8,25 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.OnBackPressed;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 
@@ -45,7 +38,7 @@ import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.sim
  * Use the {@link AccountListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AccountListFragment extends Fragment implements OnBackPressed {
+public class AccountListFragment extends Fragment implements OnBackPressed,ManageSearchView {
 
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
@@ -56,27 +49,18 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
     public int positionScroll = 0;
     private MainActivity mainActivity;
     private int countSelect = 0;
-
     PasswordManagerDatabase db;
     Exception mException = null;
     List<Account> list;
     private String nome,password,note;
     private int id;
     TextView textTitle;
+    boolean searchClick = false;
 
     private OnFragmentInteractionListener mListener;
 
-    public AccountListFragment() {
-        // Required empty public constructor
-    }
+    public AccountListFragment() {}
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment AccountListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static AccountListFragment newInstance() {
         AccountListFragment fragment = new AccountListFragment();
         return fragment;
@@ -108,42 +92,69 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
     public void onStart() {
         super.onStart();
         db = PasswordManagerDatabase.getDatabase(getActivity());
-        getListDB();
+        getListDB(false,"");
     }
 
 
     public void backFromLongClick(){
-        longClickState = false;
-        for (Account account : list){
-            account.setSelected(false);
-        }
-        setInitialAdapter(adapter);
-        mRecyclerView.setAdapter(adapter);
-        ((LinearLayoutManager)mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
+        if(searchClick){
+            searchClick = false;
+            Toolbar toolbar = (Toolbar) mainActivity.findViewById(R.id.toolbarMain);
+            TextView titleToolbar = (TextView) mainActivity.findViewById(R.id.toolbar_title);
+            mainActivity.setSupportActionBar(toolbar);
+            titleToolbar.setText(R.string.app_name);
+            toolbar.setNavigationIcon(R.drawable.menu_button2);
 
-        countSelect = 0;
-        textTitle.setText(R.string.app_name);
+            getListDB(false,"");
+            setInitialAdapter(adapter);
+            mRecyclerView.setAdapter(adapter);
+            ((LinearLayoutManager)mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
 
-        mainActivity.optionsMenu.getItem(0).setVisible(false);
-        mainActivity.optionsMenu.getItem(1).setVisible(true);
-
-        mainActivity.toolbar.setNavigationIcon(R.drawable.menu_button2);
-        mainActivity.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainActivity.drawerLayout.openDrawer(Gravity.LEFT);
-                    }
-                }, 200);
+            mainActivity.toolbar.setNavigationIcon(R.drawable.menu_button2);
+            mainActivity.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mainActivity.drawerLayout.openDrawer(Gravity.LEFT);
+                        }
+                    }, 200);
+                }
+            });
+        } else {
+            longClickState = false;
+            for (Account account : list) {
+                account.setSelected(false);
             }
-        });
+            setInitialAdapter(adapter);
+            mRecyclerView.setAdapter(adapter);
+            ((LinearLayoutManager) mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
+
+            countSelect = 0;
+            textTitle.setText(R.string.app_name);
+
+            mainActivity.optionsMenu.getItem(0).setVisible(false);
+            mainActivity.optionsMenu.getItem(1).setVisible(true);
+
+            mainActivity.toolbar.setNavigationIcon(R.drawable.menu_button2);
+            mainActivity.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mainActivity.drawerLayout.openDrawer(Gravity.LEFT);
+                        }
+                    }, 200);
+                }
+            });
+        }
     }
 
     @Override
     public void onBackPressed() {
-        if(longClickState){
+        if(longClickState || searchClick){
             backFromLongClick();
         } else {
             getActivity().finish();
@@ -271,13 +282,36 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
         });
     }
 
-    public void getListDB(){
+    public void getListDB(boolean findByName,String query){
         mException = null;
-        new ReadDBAsync().execute();
+        new ReadDBAsync(findByName,query).execute();
         db.destroyInstance();
     }
 
+    @Override
+    public void onSearchOpen() {
+        searchClick = true;
+    }
+
+    @Override
+    public void onSearchClose() {
+        backFromLongClick();
+    }
+
+    @Override
+    public void onSearchQueryChange(String query) {
+        getListDB(true,query);
+    }
+
     private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>> {
+
+        private boolean findByName;
+        private String query;
+
+        ReadDBAsync(boolean findByName,String query){
+            this.findByName = findByName;
+            this.query = query;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -288,7 +322,11 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
         protected List<Account> doInBackground(Void... voids) {
             List<Account> accountList = null;
             try {
-                accountList = db.getAccountDAO().findAllAccount();
+                if(!findByName) {
+                    accountList = db.getAccountDAO().findAllAccount();
+                } else {
+                    accountList = db.getAccountDAO().findByName(query);
+                }
             }  catch (Exception e) {
                 mException = e;
             }

@@ -2,11 +2,13 @@ package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -17,6 +19,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
@@ -108,11 +111,6 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
         getListDB();
     }
 
-    public void getListDB(){
-        mException = null;
-        new ReadDBAsync().execute();
-        db.destroyInstance();
-    }
 
     public void backFromLongClick(){
         longClickState = false;
@@ -217,8 +215,22 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
                         }, 200);
                     }
                 });
-                mainActivity.optionsMenu.getItem(0).setVisible(true);
                 mainActivity.optionsMenu.getItem(1).setVisible(false);
+                MenuItem eliminaItem = mainActivity.optionsMenu.getItem(0);
+                eliminaItem.setVisible(true);
+                eliminaItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                eliminaAccountDB();
+                            }
+                        }, 200);
+                        return false;
+                    }
+                });
+
 
 
                 adapterlongClick = new AccountAdapter(list,fragment);
@@ -259,6 +271,11 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
         });
     }
 
+    public void getListDB(){
+        mException = null;
+        new ReadDBAsync().execute();
+        db.destroyInstance();
+    }
 
     private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>> {
 
@@ -293,6 +310,71 @@ public class AccountListFragment extends Fragment implements OnBackPressed {
                 adapter = new AccountAdapter(list,fragment);
                 setInitialAdapter(adapter);
                 mRecyclerView.setAdapter(adapter);
+            } else {
+                Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public void eliminaAccountDB(){
+        String title = "Eliminazione account";
+        String message = countSelect==1 ? "Vuoi davvero eliminare l'account selezionato?" : "Vuoi davvero eliminare i " + countSelect + " account selezionati?";
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(title)
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        mException = null;
+                        new EliminaDBAsync(list).execute();
+                        db.destroyInstance();
+                    }})
+                .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    private class EliminaDBAsync extends AsyncTask<Void,Void, List<Account>> {
+
+        private List<Account> accountList;
+
+        EliminaDBAsync(List<Account> accountList){
+            this.accountList = accountList;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<Account> doInBackground(Void... voids) {
+            try {
+                List<Account> accountListDaEliminare = new ArrayList<>();
+                for (Account account : accountList){
+                    if (account.isSelected()){
+                        accountListDaEliminare.add(account);
+                    }
+                }
+                db.getAccountDAO().deleteAccount(accountListDaEliminare);
+                accountList = db.getAccountDAO().findAllAccount();
+            }  catch (Exception e) {
+                mException = e;
+            }
+            return accountList;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... voids) {
+            super.onProgressUpdate(voids);
+        }
+
+        @Override
+        protected void onPostExecute(List<Account> accountList) {
+            super.onPostExecute(accountList);
+            if(mException == null){
+                list = accountList;
+                adapter = new AccountAdapter(list,fragment);
+                backFromLongClick();
             } else {
                 Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
             }

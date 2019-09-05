@@ -179,8 +179,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Void voidParm)
-        {
+        protected void onPostExecute(Void voidParm) {
             super.onPostExecute(voidParm);
             if(mException == null){
                     MainActivity.stringSnackStatic = getString(R.string.newAccount);

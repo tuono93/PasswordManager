@@ -23,6 +23,9 @@ public interface AccountDAO {
     @Delete
     public int deleteAccount(Account account);
 
+    @Delete
+    public int deleteAccount(List<Account> accountList);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     public int updateAccount (Account account);
 

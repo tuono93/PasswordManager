@@ -180,19 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 }, 200);
                 break;
             case R.id.eliminaAccount:
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mainActivity,"elimina account",Toast.LENGTH_LONG).show();
-                    }
-                }, 200);
                 break;
             case R.id.cercaAccount:
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                    }
-                }, 200);
                 break;
             default:
                 break;

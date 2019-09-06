@@ -2,4 +2,6 @@ package it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.si
 
 public class GestioneFlussoApp {
     public static boolean flussoRegolare=false;
+    public static boolean fromCambioPasscode=false;
+
 }

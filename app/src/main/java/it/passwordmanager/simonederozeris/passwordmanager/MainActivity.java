@@ -20,12 +20,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import java.util.List;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
-import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
-import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
 
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         String stringSnack = getIntent().getStringExtra("view_snack");
         if(stringSnack != null && !stringSnack.equals("")){
             View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, stringSnack, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(parentLayout, stringSnack, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -156,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         if(GestioneFlussoApp.flussoRegolare) {
             if (!stringSnackStatic.equals("")) {
                 View parentLayout = findViewById(android.R.id.content);
-                Snackbar.make(parentLayout, stringSnackStatic, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(parentLayout, stringSnackStatic, Snackbar.LENGTH_SHORT).show();
                 stringSnackStatic = "";
             }
         } else {
@@ -176,6 +174,10 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         if(!startIntent) {
             GestioneFlussoApp.flussoRegolare = false;
+        }
+        if(GestioneFlussoApp.fromCambioPasscode){
+            GestioneFlussoApp.flussoRegolare = true;
+            GestioneFlussoApp.fromCambioPasscode = false;
         }
     }
 

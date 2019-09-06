@@ -15,12 +15,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
-import com.google.android.material.snackbar.Snackbar;
-
 import java.util.List;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
@@ -92,7 +88,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        activity.finish();
+                        backToMain();
                     }
                 }, 100);
                 break;
@@ -190,8 +186,12 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         protected void onPostExecute(Void voidParm) {
             super.onPostExecute(voidParm);
             if(mException == null){
+                if(insert) {
                     MainActivity.stringSnackStatic = getString(R.string.newAccount);
-                    activity.finish();
+                } else {
+                    MainActivity.stringSnackStatic = getString(R.string.modifyAccount);
+                }
+                backToMain();
             } else {
                 Toast.makeText(activity,mException.getMessage(),Toast.LENGTH_LONG).show();
             }
@@ -230,11 +230,15 @@ public class DettaglioAccountActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        backToMain();
+    }
+
+    public void backToMain(){
         AccountListFragment.positionScroll = scrollPosition;
         GestioneFlussoApp.flussoRegolare = true;
         startIntent = true;
-        Intent toMain = new Intent(this, MainActivity.class);
+        Intent toMain = new Intent(activity, MainActivity.class);
         startActivity(toMain);
-        this.finish();
+        activity.finish();
     }
 }

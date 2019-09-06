@@ -12,6 +12,13 @@
     <string name="esci">Esci</string>
     <string name="newPasscode">Nuovo Passcode salvato</string>
     <string name="newAccount">Nuovo Account inserito</string>
+    <string name="modifyAccount">Account modificato</string>
+    <string name="deleteAccount">Account eliminati</string>
+    <string name="noAccount">Non ci sono account</string>
+
+
+
+
 
 
 

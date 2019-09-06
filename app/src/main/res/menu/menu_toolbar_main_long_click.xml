@@ -12,7 +12,7 @@
     </item>
     <item
         android:id = "@+id/cercaAccount"
-        android:icon="@drawable/search"
+        android:icon="@drawable/google"
         android:title="Cerca Account"
         app:showAsAction="always"
         android:clickable="true"

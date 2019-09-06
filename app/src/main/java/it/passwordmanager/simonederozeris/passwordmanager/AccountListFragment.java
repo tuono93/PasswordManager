@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -365,10 +366,15 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
             super.onPostExecute(result);
             if(mException == null){
                 list = result;
-                adapter = new AccountAdapter(list,fragment);
+                TextView textEmpty = getActivity().findViewById(R.id.empty_view);
+                textEmpty.setVisibility(View.GONE);
+                adapter = new AccountAdapter(list, fragment);
                 setInitialAdapter(adapter);
                 mRecyclerView.setAdapter(adapter);
-                ((LinearLayoutManager)mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
+                if(list.isEmpty()) {
+                    ((LinearLayoutManager) mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
+                    textEmpty.setVisibility(View.VISIBLE);
+                }
             } else {
                 Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
             }
@@ -434,6 +440,12 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
                 list = accountList;
                 adapter = new AccountAdapter(list,fragment);
                 backFromLongClick();
+                View parentLayout = getActivity().findViewById(android.R.id.content);
+                Snackbar.make(parentLayout,getActivity().getString(R.string.deleteAccount),Snackbar.LENGTH_SHORT).show();
+                if(list.isEmpty()){
+                    TextView textEmpty = getActivity().findViewById(R.id.empty_view);
+                    textEmpty.setVisibility(View.VISIBLE);
+                }
             } else {
                 Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
             }
@@ -474,16 +486,6 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);

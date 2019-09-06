@@ -400,6 +400,7 @@ public class CheckPwdFragment extends Fragment {
             toMain.putExtra("view_snack", getString(R.string.newPasscode));
         }
         GestioneFlussoApp.flussoRegolare = true;
+        GestioneFlussoApp.fromCambioPasscode = true;
         startActivity(toMain);
         getActivity().finish();
     }

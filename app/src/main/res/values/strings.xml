@@ -2,6 +2,7 @@
     <string name="app_name">PasswordManager</string>
     <string name="titolo">Benvenuto in Password Manager</string>
     <string name="insPassw">Inserisci il tuo passcode</string>
+    <string name="insNewPassw">Inserisci la tua nuova passcode</string>
     <string name="insPasswErr">Passcode errato</string>
     <string name="insConfNewPassw">Conferma la tua nuova passcode</string>
     <string name="title_activity_list">ListActivity</string>

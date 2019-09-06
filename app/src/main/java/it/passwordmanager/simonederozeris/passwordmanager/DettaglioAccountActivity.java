@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 
@@ -34,6 +35,9 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     DettaglioAccountActivity activity;
     Action action;
     private int id;
+    private int scrollPosition = 0;
+    public boolean startIntent = false;
+    EditText editPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +50,8 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         titleToolbar.setText(R.string.app_name);
         toolbar.setNavigationIcon(R.drawable.back);
 
+        scrollPosition = getIntent().getIntExtra("scroll_position",0);
+
         //Creating the instance of ArrayAdapter containing list of fruit names
         ArrayAdapter<String> adapter = new ArrayAdapter<String>
                 (this, R.layout.dropdown_item_autocomplete, Constant.NOMI_ACCOUNT);
@@ -54,7 +60,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         actv.setThreshold(1);//will start working from first character
         actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
 
-        EditText editPassword = findViewById(R.id.key_text);
+        editPassword = findViewById(R.id.key_text);
         EditText editNote = findViewById(R.id.note_text);
 
         action = Action.getEnumStatoGestione(getIntent().getStringExtra("action"));
@@ -173,8 +179,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onProgressUpdate(Void... voids)
-        {
+        protected void onProgressUpdate(Void... voids) {
             super.onProgressUpdate(voids);
         }
 
@@ -188,5 +193,45 @@ public class DettaglioAccountActivity extends AppCompatActivity {
                 Toast.makeText(activity,mException.getMessage(),Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        Log.i("cicle","onPause");
+        //editPassword.clearComposingText();
+        //editPassword.setText("****");
+
+        if(!startIntent) {
+            GestioneFlussoApp.flussoRegolare = false;
+        }
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        Log.i("cicle","onStart");
+        if(!GestioneFlussoApp.flussoRegolare) {
+            this.finish();
+            Intent toCheck = new Intent(this, CheckPwdActivity.class);
+            startActivity(toCheck);
+        }
+     }
+
+     @Override
+     protected void onResume(){
+        super.onResume();
+         Log.i("cicle","onResume");
+     }
+
+
+    @Override
+    public void onBackPressed() {
+        AccountListFragment.positionScroll = scrollPosition;
+        GestioneFlussoApp.flussoRegolare = true;
+        startIntent = true;
+        Intent toMain = new Intent(this, MainActivity.class);
+        startActivity(toMain);
+        this.finish();
     }
 }

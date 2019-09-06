@@ -1,5 +1,6 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -19,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.List;
+
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     MainActivity mainActivity;
     static String stringSnackStatic = "";
     public Menu optionsMenu;
+    public boolean startIntent = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,16 +138,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if(!stringSnackStatic.equals("")){
-            View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, stringSnackStatic, Snackbar.LENGTH_LONG).show();
-            stringSnackStatic = "";
+        if(GestioneFlussoApp.flussoRegolare) {
+            if (!stringSnackStatic.equals("")) {
+                View parentLayout = findViewById(android.R.id.content);
+                Snackbar.make(parentLayout, stringSnackStatic, Snackbar.LENGTH_LONG).show();
+                stringSnackStatic = "";
+            }
+        } else {
+            this.finish();
+            Intent toCheck = new Intent(this, CheckPwdActivity.class);
+            startActivity(toCheck);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if(!startIntent) {
+            GestioneFlussoApp.flussoRegolare = false;
+        }
     }
 
     @Override

@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.Flusso;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoCheckPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
@@ -50,14 +51,11 @@ public class CheckPwdFragment extends Fragment {
     private static final String ARG_STATO = "stato";
     private static final String ARG_LAYOUT_CONTAINER = "layout_container";
     private static final String ARG_VALUE = "value";
-
-
     public EditText editTextPwd1, editTextPwd2, editTextPwd3, editTextPwd4;
     public LinearLayout linearLayoutPwd;
     public TextView textPwd;
     Animation animationPwd;
     SharedPreferences sharedPreferences;
-
     private Flusso flusso;
     private TipoStatoPwd stato;
     private int layout_container;
@@ -88,15 +86,6 @@ public class CheckPwdFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param flusso Parameter 1.
-     * @param stato Parameter 2.
-     * @return A new instance of fragment CheckPwdFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static CheckPwdFragment newInstance(Flusso flusso, TipoStatoPwd stato,int layout_container) {
         CheckPwdFragment fragment = new CheckPwdFragment();
         int numFlusso = getNumFlusso(flusso);
@@ -136,7 +125,6 @@ public class CheckPwdFragment extends Fragment {
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -146,6 +134,9 @@ public class CheckPwdFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
+        if(flusso.getClass().getName() == FlussoModificaPwd.class.getName()){
+            textPwd.setText(getResources().getString(R.string.insNewPassw));
+        }
         setEditText();
         if(stato == TipoStatoPwd.ERR){
             textPwd.setText(getResources().getString(R.string.insPasswErr));
@@ -408,6 +399,7 @@ public class CheckPwdFragment extends Fragment {
         if(viewSnack) {
             toMain.putExtra("view_snack", getString(R.string.newPasscode));
         }
+        GestioneFlussoApp.flussoRegolare = true;
         startActivity(toMain);
         getActivity().finish();
     }

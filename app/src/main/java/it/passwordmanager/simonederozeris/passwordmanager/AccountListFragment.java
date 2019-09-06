@@ -27,6 +27,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 
@@ -46,7 +47,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     private AccountAdapter adapterlongClick;
     private AccountListFragment fragment;
     public boolean longClickState = false;
-    public int positionScroll = 0;
+    public static int positionScroll = 0;
     private MainActivity mainActivity;
     private int countSelect = 0;
     PasswordManagerDatabase db;
@@ -157,7 +158,20 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
         if(longClickState || searchClick){
             backFromLongClick();
         } else {
-            getActivity().finish();
+            String title = "Uscita";
+            String message = "Vuoi davvero uscire dall'app?";
+
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            GestioneFlussoApp.flussoRegolare = true;
+                            getActivity().finish();
+                            mainActivity.startIntent = true;
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
         }
     }
 
@@ -185,16 +199,22 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
                 password = account.getPassword();
                 note = account.getNota();
 
+                positionScroll = ((LinearLayoutManager)mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        GestioneFlussoApp.flussoRegolare = true;
+                        mainActivity.startIntent = true;
                         Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
                         toMain.putExtra("action",Action.UPDATE.getAction());
                         toMain.putExtra("id",id);
                         toMain.putExtra("nome",nome);
                         toMain.putExtra("password",password);
                         toMain.putExtra("note",note);
-                        startActivity(toMain); //perform Task
+                        toMain.putExtra("scroll_position",positionScroll);
+                        startActivity(toMain);
+                        mainActivity.finish();
                     }
                 }, 70);
             }
@@ -348,6 +368,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
                 adapter = new AccountAdapter(list,fragment);
                 setInitialAdapter(adapter);
                 mRecyclerView.setAdapter(adapter);
+                ((LinearLayoutManager)mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
             } else {
                 Toast.makeText(getActivity(),mException.getMessage(),Toast.LENGTH_LONG).show();
             }
@@ -431,9 +452,12 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                GestioneFlussoApp.flussoRegolare = true;
+                mainActivity.startIntent = true;
                 Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
                 toMain.putExtra("action",Action.INSERT.getAction());
                 startActivity(toMain);
+                mainActivity.finish();
             }
         });
     }

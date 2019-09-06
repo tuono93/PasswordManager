@@ -1,10 +1,12 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -93,7 +95,20 @@ public class MainActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentCheckPwd).commit();
                         break;
                     case R.id.esci:
-                        finish();
+                        String title = "Uscita";
+                        String message = "Vuoi davvero uscire dall'app?";
+
+                        new AlertDialog.Builder(mainActivity)
+                                .setTitle(title)
+                                .setMessage(message)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        GestioneFlussoApp.flussoRegolare = true;
+                                        finish();
+                                        mainActivity.startIntent = true;
+                                    }})
+                                .setNegativeButton(android.R.string.no, null).show();
                         break;
                     default:
                         break;

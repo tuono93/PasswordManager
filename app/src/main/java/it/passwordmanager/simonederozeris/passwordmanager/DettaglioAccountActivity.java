@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -42,6 +43,8 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         activity = this;
         setContentView(R.layout.activity_dettaglio_account);
         toolbar = (Toolbar) findViewById(R.id.toolbarDettaglio);
@@ -198,19 +201,24 @@ public class DettaglioAccountActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        Log.i("cicle","onPause");
-        //editPassword.clearComposingText();
-        //editPassword.setText("****");
-
         if(!startIntent) {
             GestioneFlussoApp.flussoRegolare = false;
         }
     }
 
     @Override
+    protected void onStop(){
+        super.onStop();
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
+    }
+
+
+    @Override
     protected void onStart(){
         super.onStart();
-        Log.i("cicle","onStart");
         if(!GestioneFlussoApp.flussoRegolare) {
             this.finish();
             Intent toCheck = new Intent(this, CheckPwdActivity.class);
@@ -218,11 +226,6 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         }
      }
 
-     @Override
-     protected void onResume(){
-        super.onResume();
-         Log.i("cicle","onResume");
-     }
 
 
     @Override

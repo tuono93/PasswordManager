@@ -2,6 +2,7 @@ package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -18,7 +19,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mainActivity = this;
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         toolbar = (Toolbar) findViewById(R.id.toolbarMain);
         titleToolbar = (TextView) findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
@@ -85,10 +89,20 @@ public class MainActivity extends AppCompatActivity {
                 final int itemId = menuItem.getItemId();
                 switch(itemId){
                     case R.id.list_account:
+                        mainActivity.optionsMenu.getItem(1).setVisible(true);
+                        Toolbar.LayoutParams params = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
+                        params.setMargins(0,0,8,0);
+                        titleToolbar.setLayoutParams(params);
+
                         Fragment fragmentAccountList = AccountListFragment.newInstance();
                         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentAccountList).commit();
                         break;
                     case R.id.cambia_pwd:
+                        mainActivity.optionsMenu.getItem(1).setVisible(false);
+                        Toolbar.LayoutParams params2 = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
+                        params2.setMargins(0,0,150,0);
+                        titleToolbar.setLayoutParams(params2);
+
                         Fragment fragmentCheckPwd = CheckPwdFragment.newInstance(new FlussoModificaPwd(), TipoStatoPwd.OK,R.id.anchor_point_main);
                         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentCheckPwd).commit();
                         break;

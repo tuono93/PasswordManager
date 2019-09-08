@@ -1,6 +1,7 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,6 +44,7 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         activity = this;
         setContentView(R.layout.activity_dettaglio_account);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         toolbar = (Toolbar) findViewById(R.id.toolbarDettaglio);
         titleToolbar = (TextView) findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);

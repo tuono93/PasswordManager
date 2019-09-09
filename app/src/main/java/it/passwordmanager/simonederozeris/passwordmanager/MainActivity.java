@@ -173,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(parentLayout, stringSnackStatic, Snackbar.LENGTH_SHORT).show();
                 stringSnackStatic = "";
             }
+            GestioneFlussoApp.fromCambioPasscode = false;
         } else {
             this.finish();
             Intent toCheck = new Intent(this, CheckPwdActivity.class);

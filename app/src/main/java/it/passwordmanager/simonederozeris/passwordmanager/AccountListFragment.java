@@ -56,8 +56,11 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     List<Account> list;
     private String nome,password,note;
     private int id;
-    TextView textTitle;
     boolean searchClick = false;
+    TextView textEmpty;
+    Toolbar toolbar;
+    TextView titleToolbar;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,7 +80,12 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        textTitle = mainActivity.toolbar.findViewById(R.id.toolbar_title);
+        toolbar = (Toolbar) mainActivity.findViewById(R.id.toolbarMain);
+        titleToolbar = (TextView) mainActivity.findViewById(R.id.toolbar_title);
+        mainActivity.setSupportActionBar(toolbar);
+        titleToolbar.setText(R.string.app_name);
+        toolbar.setNavigationIcon(R.drawable.menu_button2);
+
         View rootView = inflater.inflate(R.layout.fragment_account_list, container, false);
         fab = (FloatingActionButton) rootView.findViewById(R.id.fabNewAccount);
         mRecyclerView = rootView.findViewById(R.id.listAccount);
@@ -87,6 +95,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
         LineItemDecoration lineItemDecoration = new LineItemDecoration();
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(lineItemDecoration);
+
         return rootView;
     }
 
@@ -101,8 +110,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     public void backFromLongClick(){
         if(searchClick){
             searchClick = false;
-            Toolbar toolbar = (Toolbar) mainActivity.findViewById(R.id.toolbarMain);
-            TextView titleToolbar = (TextView) mainActivity.findViewById(R.id.toolbar_title);
+            toolbar = (Toolbar) mainActivity.findViewById(R.id.toolbarMain);
+            titleToolbar = (TextView) mainActivity.findViewById(R.id.toolbar_title);
             mainActivity.setSupportActionBar(toolbar);
             titleToolbar.setText(R.string.app_name);
             toolbar.setNavigationIcon(R.drawable.menu_button2);
@@ -134,7 +143,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
             ((LinearLayoutManager) mRecyclerView.getLayoutManager()).scrollToPosition(positionScroll);
 
             countSelect = 0;
-            textTitle.setText(R.string.app_name);
+            titleToolbar.setText(R.string.app_name);
 
             mainActivity.optionsMenu.getItem(0).setVisible(false);
             mainActivity.optionsMenu.getItem(1).setVisible(true);
@@ -158,6 +167,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     public void onBackPressed() {
         if(longClickState || searchClick){
             backFromLongClick();
+        } else if (mainActivity.drawerOpened){
+            mainActivity.drawerLayout.closeDrawer(Gravity.LEFT);
         } else {
             String title = "Uscita";
             String message = "Vuoi davvero uscire dall'app?";
@@ -187,7 +198,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
             backFromLongClick();
         } else {
             String title = countSelect == 1 ? countSelect + " account selezionato" : countSelect + " account selezionati";
-            textTitle.setText(title);
+            titleToolbar.setText(title);
         }
     }
 
@@ -366,7 +377,6 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
             super.onPostExecute(result);
             if(mException == null){
                 list = result;
-                TextView textEmpty = getActivity().findViewById(R.id.empty_view);
                 textEmpty.setVisibility(View.GONE);
                 adapter = new AccountAdapter(list, fragment);
                 setInitialAdapter(adapter);
@@ -472,6 +482,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
                 mainActivity.finish();
             }
         });
+        textEmpty = getActivity().findViewById(R.id.empty_view);
     }
 
     @Override

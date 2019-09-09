@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     static String stringSnackStatic = "";
     public Menu optionsMenu;
     public boolean startIntent = false;
+    public boolean drawerOpened = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +71,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerOpened(View drawerView){
                 super.onDrawerOpened(drawerView);
-                Log.d("drawer","Drawer Opened");
+                drawerOpened = true;
             }
 
             @Override
             public void onDrawerClosed(View drawerView){
                 super.onDrawerClosed(drawerView);
-                Log.d("drawer","Drawer Closed");
+                drawerOpened = false;
             }
         });
     }
@@ -198,7 +200,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(!tellFragments()){
-            super.onBackPressed();
+            String title = "Uscita";
+            String message = "Vuoi davvero uscire dall'app?";
+
+            new AlertDialog.Builder(mainActivity)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            GestioneFlussoApp.flussoRegolare = true;
+                            mainActivity.finish();
+                            mainActivity.startIntent = true;
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
         }
     }
 

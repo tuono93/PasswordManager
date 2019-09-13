@@ -11,13 +11,15 @@ public class Account {
     private int id;
 
     private String nome;
+    private String nomeUtente;
     private String password;
     private String nota;
     @Ignore
     private boolean selected;
 
-    public Account(String nome, String password, String nota) {
+    public Account(String nome, String nomeUtente, String password, String nota) {
         this.nome = nome;
+        this.nomeUtente = nomeUtente;
         this.password = password;
         this.nota = nota;
     }
@@ -36,6 +38,14 @@ public class Account {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getNomeUtente() {
+        return nomeUtente;
+    }
+
+    public void setNomeUtente(String nomeUtente) {
+        this.nomeUtente = nomeUtente;
     }
 
     public String getPassword() {

@@ -54,7 +54,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     PasswordManagerDatabase db;
     Exception mException = null;
     List<Account> list;
-    private String nome,password,note;
+    private String nomeAccount,nomeUtente,password,note;
     private int id;
     boolean searchClick = false;
     TextView textEmpty;
@@ -197,7 +197,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
         if (countSelect == 0){
             backFromLongClick();
         } else {
-            String title = countSelect == 1 ? countSelect + " account selezionato" : countSelect + " account selezionati";
+            String title = countSelect == 1 ? countSelect + " nomeAccount selezionato" : countSelect + " nomeAccount selezionati";
             titleToolbar.setText(title);
         }
     }
@@ -207,7 +207,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
             @Override
             public void onAccountClicked(Account account, int position, View v) {
                 id = account.getId();
-                nome = account.getNome();
+                nomeAccount = account.getNome();
+                nomeUtente = account.getNomeUtente();
                 password = account.getPassword();
                 note = account.getNota();
 
@@ -221,7 +222,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
                         Intent toMain = new Intent(getActivity(), DettaglioAccountActivity.class);
                         toMain.putExtra("action",Action.UPDATE.getAction());
                         toMain.putExtra("id",id);
-                        toMain.putExtra("nome",nome);
+                        toMain.putExtra("nomeAccount", nomeAccount);
+                        toMain.putExtra("nomeUtente",nomeUtente);
                         toMain.putExtra("password",password);
                         toMain.putExtra("note",note);
                         toMain.putExtra("scroll_position",positionScroll);
@@ -234,7 +236,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
             @Override
             public void onAccountLongClicked(Account account, int position, View v) {
                 id = account.getId();
-                nome = account.getNome();
+                AccountListFragment.this.nomeAccount = account.getNome();
                 password = account.getPassword();
                 note = account.getNota();
 
@@ -281,7 +283,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
                     @Override
                     public void onAccountClicked(Account account, int position,View v) {
                         id = account.getId();
-                        nome = account.getNome();
+                        AccountListFragment.this.nomeAccount = account.getNome();
                         password = account.getPassword();
                         note = account.getNota();
 
@@ -392,8 +394,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     }
 
     public void eliminaAccountDB(){
-        String title = "Eliminazione account";
-        String message = countSelect==1 ? "Vuoi davvero eliminare l'account selezionato?" : "Vuoi davvero eliminare i " + countSelect + " account selezionati?";
+        String title = "Eliminazione nomeAccount";
+        String message = countSelect==1 ? "Vuoi davvero eliminare l'nomeAccount selezionato?" : "Vuoi davvero eliminare i " + countSelect + " nomeAccount selezionati?";
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(title)

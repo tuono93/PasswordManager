@@ -62,16 +62,19 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         actv.setAdapter(adapter);//setting the adapter data into the AutoCompleteTextView
 
         editPassword = findViewById(R.id.key_text);
+        EditText editNomeAccount = findViewById(R.id.nome_utente_text);
         EditText editNote = findViewById(R.id.note_text);
 
         action = Action.getEnumStatoGestione(getIntent().getStringExtra("action"));
         if(action == Action.UPDATE){
-            String nome = getIntent().getStringExtra("nome");
+            String nomeAccount = getIntent().getStringExtra("nomeAccount");
+            String nomeUtente = getIntent().getStringExtra("nomeUtente");
             String password = getIntent().getStringExtra("password");
             String note = getIntent().getStringExtra("note");
             id = getIntent().getIntExtra("id",0);
 
-            actv.setText(nome);
+            actv.setText(nomeAccount);
+            editNomeAccount.setText(nomeUtente);
             editPassword.setText(password);
             editNote.setText(note);
         };
@@ -100,20 +103,22 @@ public class DettaglioAccountActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         AutoCompleteTextView nomeAccountAtv  = findViewById(R.id.autoCompleteNomeAccount);
+                        EditText nomeUtenteEt  = findViewById(R.id.nome_utente_text);
                         EditText passwordEt  = findViewById(R.id.key_text);
                         EditText noteEt  = findViewById(R.id.note_text);
                         String nomeAccount = nomeAccountAtv != null ? nomeAccountAtv.getText().toString().trim() : null;
+                        String nomeUtente = nomeUtenteEt != null ? nomeUtenteEt.getText().toString().trim() : null;
                         String password = passwordEt != null ? passwordEt.getText().toString().trim() : null;
                         String note = noteEt != null ? noteEt.getText().toString().trim() : null;
 
-                        String error = checkTextinput(nomeAccount,password,note);
+                        String error = checkTextinput(nomeAccount,nomeUtente,password,note);
                         if(error.equals("")){
                             if (action == Action.INSERT){
-                                Account account = new Account(nomeAccount,password,note);
+                                Account account = new Account(nomeAccount,nomeUtente,password,note);
                                 db = PasswordManagerDatabase.getDatabase(activity);
                                 insertUpdateAccountDB(account,true);
                             } else {
-                                Account account = new Account(nomeAccount,password,note);
+                                Account account = new Account(nomeAccount,nomeUtente,password,note);
                                 account.setId(id);
                                 db = PasswordManagerDatabase.getDatabase(activity);
                                 insertUpdateAccountDB(account,false);
@@ -130,11 +135,13 @@ public class DettaglioAccountActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public String checkTextinput(String nomeAccount, String password,String note){
+    public String checkTextinput(String nomeAccount, String nomeUtente, String password,String note){
         String error = "";
 
         if(nomeAccount == null || nomeAccount.equals("")){
-            error = "Il nome dell'account è obbligatorio";
+            error = "l'account è obbligatorio";
+        } else if (nomeUtente == null || nomeUtente.equals("")){
+            error = "Il nome utente è obbligatorio";
         } else if (password == null || password.equals("")){
             error = "La password è obbligatoria";
         }

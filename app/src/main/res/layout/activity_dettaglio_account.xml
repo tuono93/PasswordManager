@@ -52,7 +52,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:scaleType="centerInside"
-            android:src="@drawable/account"/>
+            android:src="@drawable/site"/>
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteNomeAccount"
@@ -66,16 +66,50 @@
             android:maxLines="1"
             android:inputType="text"
             android:textSize="16dp"
-            android:hint="Nome Account"
+            android:hint="Account"
             android:textColorHint="@color/Gray"/>
 
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layoutNomeUtente"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/layoutAccount"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/nome_utente_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/account"/>
+
+        <EditText
+            android:id="@+id/nome_utente_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textColor="@color/White"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold|italic"
+            android:layout_marginLeft="40dp"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textSize="16dp"
+            android:hint="Nome Utente"
+            android:textColorHint="@color/Gray"
+            />
     </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/layoutPwd"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_below="@+id/layoutAccount"
+        android:layout_below="@+id/layoutNomeUtente"
         android:layout_marginTop="30dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"

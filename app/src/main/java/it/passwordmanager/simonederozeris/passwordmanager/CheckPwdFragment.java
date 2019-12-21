@@ -256,10 +256,10 @@ public class CheckPwdFragment extends Fragment {
                     String p1 = editTextPwd1.getText().toString();
                     String p2 = editTextPwd2.getText().toString();
                     String p3 = editTextPwd3.getText().toString();
-                    String passcode = p1 + p2 + p3 + unicodeChar;
+                    String p4 = editTextPwd4.getText().toString();
+                    String passcode = p1 + p2 + p3 + p4;
 
                     gestioneFlusso(passcode);
-
                 } else {
                     editTextPwd3.setText("");
                     editTextPwd3.requestFocus();

@@ -1,11 +1,27 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,12 +39,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import java.sql.Driver;
+import java.util.Collections;
 import java.util.List;
-
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
     public Menu optionsMenu;
     public boolean startIntent = false;
     public boolean drawerOpened = false;
+    private static final int REQUEST_CODE_SIGN_IN = 100;
+    private GoogleSignInClient mGoogleSignInClient;
+    private DriveServiceHelper mDriveServiceHelper;
 
 
     @Override
@@ -108,6 +128,15 @@ public class MainActivity extends AppCompatActivity {
                         Fragment fragmentCheckPwd = CheckPwdFragment.newInstance(new FlussoModificaPwd(), TipoStatoPwd.OK,R.id.anchor_point_main);
                         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentCheckPwd).commit();
                         break;
+                    case R.id.backup:
+                        mainActivity.optionsMenu.getItem(1).setVisible(false);
+                        Toolbar.LayoutParams params3 = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
+                        params3.setMargins(0,0,150,0);
+                        titleToolbar.setLayoutParams(params3);
+
+                        manageGoogleDrive();
+
+                        break;
                     case R.id.esci:
                         String title = "Uscita";
                         String message = "Vuoi davvero uscire dall'app?";
@@ -133,6 +162,91 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void manageGoogleDrive(){
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        if (account == null) {
+            signIn();
+        } else {
+            Log.i("Google",account.getEmail());
+            GoogleAccountCredential credential =
+                    GoogleAccountCredential.usingOAuth2(
+                            getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
+            credential.setSelectedAccountName(account.getAccount().name);
+            com.google.api.services.drive.Drive googleDriveService =
+                    new com.google.api.services.drive.Drive.Builder(
+                            AndroidHttp.newCompatibleTransport(),
+                            new GsonFactory(),
+                            credential)
+                            .setApplicationName("AppName")
+                            .build();
+            mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+        }
+    }
+
+    private void signIn() {
+        mGoogleSignInClient = buildGoogleSignInClient();
+        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+    }
+
+    private GoogleSignInClient buildGoogleSignInClient() {
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestScopes(new Scope(DriveScopes.DRIVE))
+                        .requestEmail()
+                        .build();
+        return GoogleSignIn.getClient(getApplicationContext(), signInOptions);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        switch (requestCode) {
+            case REQUEST_CODE_SIGN_IN:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResult(resultData);
+                }
+                break;
+
+
+        }
+
+        super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+    public void test() {
+        System.out.println("test");
+    }
+
+    private void handleSignInResult(Intent result) {
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
+                        Log.i("Google", "Signed in as " + googleSignInAccount.getEmail());
+
+                        GoogleAccountCredential credential =
+                                GoogleAccountCredential.usingOAuth2(
+                                        getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
+                        credential.setSelectedAccountName(googleSignInAccount.getAccount().name);
+                        com.google.api.services.drive.Drive googleDriveService =
+                                new com.google.api.services.drive.Drive.Builder(
+                                        AndroidHttp.newCompatibleTransport(),
+                                        new GsonFactory(),
+                                        credential)
+                                        .setApplicationName("AppName")
+                                        .build();
+                        mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+
+                        Log.i("Google", "handleSignInResult: " + mDriveServiceHelper);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Google", "Unable to sign in.", e);
+                    }
+                });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

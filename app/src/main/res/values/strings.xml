@@ -15,6 +15,9 @@
     <string name="modifyAccount">Account modificato</string>
     <string name="deleteAccount">Account eliminati</string>
     <string name="noAccount">Non ci sono account</string>
+    <string name="backup_string">Backup</string>
+    <string name="server_client_id">853177087172-dsgup77v80d14l5d01giq08jdn0t9i7h.apps.googleusercontent.com</string>
+
 
 
 

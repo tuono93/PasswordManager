@@ -14,13 +14,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.ParentReference;
+import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -30,6 +35,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -39,7 +45,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.io.IOException;
 import java.sql.Driver;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
@@ -165,22 +174,39 @@ public class MainActivity extends AppCompatActivity {
     public void manageGoogleDrive(){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
-        if (account == null) {
+       if (account == null) {
             signIn();
         } else {
             Log.i("Google",account.getEmail());
             GoogleAccountCredential credential =
                     GoogleAccountCredential.usingOAuth2(
-                            getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
+                            getApplicationContext(), Collections.singleton(DriveScopes.DRIVE));
             credential.setSelectedAccountName(account.getAccount().name);
+
             com.google.api.services.drive.Drive googleDriveService =
                     new com.google.api.services.drive.Drive.Builder(
                             AndroidHttp.newCompatibleTransport(),
                             new GsonFactory(),
                             credential)
-                            .setApplicationName("AppName")
+                            .setApplicationName("PasswordManager")
                             .build();
-            mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+
+           mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
+           mDriveServiceHelper.createTextFile()
+                    .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                        @Override
+                        public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
+                            Gson gson = new Gson();
+                            Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
+                        }
+                     })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("Google", "onFailure: " + e.getMessage());
+                        }
+                    });
+            Log.i("Google","file creato!");
         }
     }
 
@@ -233,10 +259,9 @@ public class MainActivity extends AppCompatActivity {
                                         AndroidHttp.newCompatibleTransport(),
                                         new GsonFactory(),
                                         credential)
-                                        .setApplicationName("AppName")
+                                        .setApplicationName("PasswordManager")
                                         .build();
                         mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
-
                         Log.i("Google", "handleSignInResult: " + mDriveServiceHelper);
                     }
                 })

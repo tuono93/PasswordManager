@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -14,17 +13,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.ParentReference;
 import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
@@ -35,23 +29,20 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.sql.Driver;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.DriveServiceHelper;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.GestisciOperazioniDrive;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.GoogleDriveFileHolder;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
 
@@ -191,22 +182,8 @@ public class MainActivity extends AppCompatActivity {
                             .setApplicationName("PasswordManager")
                             .build();
 
-           mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
-           mDriveServiceHelper.createTextFile()
-                    .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                        @Override
-                        public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
-                            Gson gson = new Gson();
-                            Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
-                        }
-                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("Google", "onFailure: " + e.getMessage());
-                        }
-                    });
-            Log.i("Google","file creato!");
+           GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService);
+           gestioneDrive.createBackup();
         }
     }
 
@@ -261,8 +238,9 @@ public class MainActivity extends AppCompatActivity {
                                         credential)
                                         .setApplicationName("PasswordManager")
                                         .build();
-                        mDriveServiceHelper = new DriveServiceHelper(googleDriveService);
-                        Log.i("Google", "handleSignInResult: " + mDriveServiceHelper);
+                        Log.i("Google", "Sign in OK");
+                        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService);
+                        gestioneDrive.createBackup();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

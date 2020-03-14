@@ -44,13 +44,13 @@ public abstract class PasswordManagerDatabase extends RoomDatabase {
         INSTANCE = null;
     }
 
-    public static File createBackup(Context ctx) {
-        return new File(ctx.getDatabasePath("account_db").getAbsolutePath());
+    public static File createBackup(Context ctx,String titleFile) {
+        return new File(ctx.getDatabasePath(titleFile).getAbsolutePath());
     }
 
-    public static void restoreDatabase(Context ctx, File backupFile) {
+    public static void restoreDatabase(Context ctx, File backupFile,String titleFile) {
         try {
-            File currentDB = new File(ctx.getDatabasePath("account_db").getAbsolutePath());
+            File currentDB = new File(ctx.getDatabasePath(titleFile).getAbsolutePath());
             if (currentDB.exists()) {
 
                 FileChannel src = new FileInputStream(backupFile).getChannel();

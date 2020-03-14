@@ -35,7 +35,7 @@ public class DriveServiceHelper {
     private final Drive mDriveService;
     private String fileId;
     private String mimeType = "application/octet-stream";
-    private String nameFileNewBackup = "Backup_password_manager_XzRtghu23.db" ;
+    private String nameFileNewBackup = "" ;
     private String nameFolderNewBackup = "PasswordManager" ;
     private String folderBackupId = "";
     private Context context;
@@ -77,14 +77,15 @@ public class DriveServiceHelper {
      * Creates a text file in the user's My Drive folder and returns its file ID.
      */
 
-    public Task<GoogleDriveFileHolder> createFile(String folderBackupIdParam) {
+    public Task<GoogleDriveFileHolder> createFile(String folderBackupIdParam,String titleFile) {
         this.folderBackupId = folderBackupIdParam;
+        this.nameFileNewBackup = titleFile;
         return Tasks.call(mExecutor, new Callable<GoogleDriveFileHolder>() {
             @Override
             public GoogleDriveFileHolder call() throws Exception {
                 GoogleDriveFileHolder googleDriveFileHolder = null;
                 try {
-                    java.io.File fileBackup = PasswordManagerDatabase.createBackup(context);
+                    java.io.File fileBackup = PasswordManagerDatabase.createBackup(context,nameFileNewBackup);
                     FileInputStream inp = new FileInputStream(fileBackup);
                     byte[] arrayContent = IOUtils.toByteArray(inp);
 
@@ -137,7 +138,8 @@ public class DriveServiceHelper {
         });
     }
 
-    public Task<GoogleDriveFileHolder> getFile() {
+    public Task<GoogleDriveFileHolder> getFile(String titleFile) {
+        this.nameFileNewBackup = titleFile;
         return Tasks.call(mExecutor, new Callable<GoogleDriveFileHolder>() {
             @Override
             public GoogleDriveFileHolder call() throws Exception {

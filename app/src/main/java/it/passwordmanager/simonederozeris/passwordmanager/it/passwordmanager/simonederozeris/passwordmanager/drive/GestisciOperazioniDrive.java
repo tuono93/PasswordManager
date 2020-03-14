@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import it.passwordmanager.simonederozeris.passwordmanager.Constant;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
@@ -25,6 +26,8 @@ public class GestisciOperazioniDrive {
     public com.google.api.services.drive.Drive googleDriveService;
     private DriveServiceHelper driveServiceHelper;
     private Context context;
+    private String idFolderBackup;
+    private String titleFile;
 
 
     public GestisciOperazioniDrive (com.google.api.services.drive.Drive googleDriveService, Context context){
@@ -43,7 +46,7 @@ public class GestisciOperazioniDrive {
                         if(googleDriveFileHolder.getId()==null){
                             createBackupAndFileFolder();
                         } else {
-                            createBackupFile(googleDriveFileHolder.getId());
+                            createBackupFile(googleDriveFileHolder.getId(),"account_db");
                         }
                     }
                 })
@@ -56,13 +59,20 @@ public class GestisciOperazioniDrive {
     }
 
 
-    public void createBackupFile(String idFolderBackup){
-        driveServiceHelper.createFile(idFolderBackup)
+    public void createBackupFile(String idFolderBackupParam,String titleFileParam){
+        this.titleFile = titleFileParam;
+        this.idFolderBackup = idFolderBackupParam;
+        driveServiceHelper.createFile(idFolderBackup,titleFile)
                     .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                         @Override
                         public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
                             Gson gson = new Gson();
                             Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
+                            if(titleFile.equals("account_db")){
+                                createBackupFile(idFolderBackup,"account_db-shm");
+                            } else if(titleFile.equals("account_db-shm")){
+                                createBackupFile(idFolderBackup,"account_db-wal");
+                            }
                         }
                      })
                     .addOnFailureListener(new OnFailureListener() {
@@ -80,20 +90,7 @@ public class GestisciOperazioniDrive {
                     public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
                         Gson gson = new Gson();
                         Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
-                        driveServiceHelper.createFile(googleDriveFileHolder.getId())
-                                .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                            @Override
-                            public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
-                                Gson gson = new Gson();
-                                Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
-                            }
-                        })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d("Google", "onFailure: " + e.getMessage());
-                                    }
-                                });;
+                        createBackupFile(googleDriveFileHolder.getId(),"account_db");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -105,7 +102,12 @@ public class GestisciOperazioniDrive {
     }
 
     public void createRestore(){
-        driveServiceHelper.getFile()
+        createRestore("account_db");
+    }
+
+    public void createRestore(String titleFileParam){
+        this.titleFile = titleFileParam;
+        driveServiceHelper.getFile(titleFile)
                 .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                     @Override
                     public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
@@ -120,9 +122,14 @@ public class GestisciOperazioniDrive {
                                         try {
                                             byte[] byteFile = googleDriveFileHolder.getStream().toByteArray();
                                             File directory = context.getFilesDir(); //or getExternalFilesDir(null); for external storage
-                                            File fileBackup = new File(directory, "account_db");
+                                            File fileBackup = new File(directory, titleFile);
                                             FileUtils.writeByteArrayToFile(fileBackup, byteFile);
-                                            PasswordManagerDatabase.restoreDatabase(context,fileBackup);
+                                            PasswordManagerDatabase.restoreDatabase(context,fileBackup,titleFile);
+                                            if(titleFile.equals("account_db")){
+                                                createRestore("account_db-shm");
+                                            } else if(titleFile.equals("account_db-shm")){
+                                                createRestore("account_db-wal");
+                                            }
                                         } catch (Exception e){
                                             Log.d("Google", "Errore nel restore: " + e.getMessage());
                                         }

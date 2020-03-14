@@ -2,6 +2,9 @@ package it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.si
 
 import com.google.api.client.util.DateTime;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+
 public class GoogleDriveFileHolder {
 
     private String id;
@@ -10,6 +13,7 @@ public class GoogleDriveFileHolder {
     private long size;
     private DateTime createdTime;
     private Boolean starred;
+    private ByteArrayOutputStream stream;
 
 
     public DateTime getCreatedTime() {
@@ -58,5 +62,13 @@ public class GoogleDriveFileHolder {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    public ByteArrayOutputStream getStream() {
+        return stream;
+    }
+
+    public void setStream(ByteArrayOutputStream stream) {
+        this.stream = stream;
     }
 }

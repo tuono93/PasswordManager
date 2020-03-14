@@ -19,7 +19,6 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.DriveScopes;
-import com.google.gson.Gson;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -42,7 +41,6 @@ import java.util.List;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.DriveServiceHelper;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.GestisciOperazioniDrive;
-import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.GoogleDriveFileHolder;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
 
@@ -58,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
     public Menu optionsMenu;
     public boolean startIntent = false;
     public boolean drawerOpened = false;
-    private static final int REQUEST_CODE_SIGN_IN = 100;
+    private static final int REQUEST_CODE_SIGN_IN_FOR_BACKUP = 100;
+    private static final int REQUEST_CODE_SIGN_IN_FOR_RESTORE = 200;
     private GoogleSignInClient mGoogleSignInClient;
     private DriveServiceHelper mDriveServiceHelper;
 
@@ -133,9 +132,14 @@ public class MainActivity extends AppCompatActivity {
                         Toolbar.LayoutParams params3 = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
                         params3.setMargins(0,0,150,0);
                         titleToolbar.setLayoutParams(params3);
-
-                        manageGoogleDrive();
-
+                        createBackup();
+                        break;
+                    case R.id.restore:
+                        mainActivity.optionsMenu.getItem(1).setVisible(false);
+                        Toolbar.LayoutParams params4 = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
+                        params4.setMargins(0,0,150,0);
+                        titleToolbar.setLayoutParams(params4);
+                        createRestore();
                         break;
                     case R.id.esci:
                         String title = "Uscita";
@@ -162,11 +166,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void manageGoogleDrive(){
+    public void createBackup(){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
        if (account == null) {
-            signIn();
+            signIn(REQUEST_CODE_SIGN_IN_FOR_BACKUP);
         } else {
             Log.i("Google",account.getEmail());
             GoogleAccountCredential credential =
@@ -182,14 +186,39 @@ public class MainActivity extends AppCompatActivity {
                             .setApplicationName("PasswordManager")
                             .build();
 
-           GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService);
+           GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
            gestioneDrive.createBackup();
         }
     }
 
-    private void signIn() {
+    public void createRestore(){
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        if (account == null) {
+            signIn(REQUEST_CODE_SIGN_IN_FOR_RESTORE);
+        } else {
+            Log.i("Google",account.getEmail());
+            GoogleAccountCredential credential =
+                    GoogleAccountCredential.usingOAuth2(
+                            getApplicationContext(), Collections.singleton(DriveScopes.DRIVE));
+            credential.setSelectedAccountName(account.getAccount().name);
+
+            com.google.api.services.drive.Drive googleDriveService =
+                    new com.google.api.services.drive.Drive.Builder(
+                            AndroidHttp.newCompatibleTransport(),
+                            new GsonFactory(),
+                            credential)
+                            .setApplicationName("PasswordManager")
+                            .build();
+
+            GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
+            gestioneDrive.createRestore();
+        }
+    }
+
+    private void signIn(int code) {
         mGoogleSignInClient = buildGoogleSignInClient();
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+        startActivityForResult(mGoogleSignInClient.getSignInIntent(), code);
     }
 
     private GoogleSignInClient buildGoogleSignInClient() {
@@ -204,13 +233,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         switch (requestCode) {
-            case REQUEST_CODE_SIGN_IN:
+            case REQUEST_CODE_SIGN_IN_FOR_BACKUP:
                 if (resultCode == Activity.RESULT_OK && resultData != null) {
-                    handleSignInResult(resultData);
+                    handleSignInResultForBackup(resultData);
                 }
                 break;
-
-
+            case REQUEST_CODE_SIGN_IN_FOR_RESTORE:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResultForRestore(resultData);
+                }
+                break;
         }
 
         super.onActivityResult(requestCode, resultCode, resultData);
@@ -220,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("test");
     }
 
-    private void handleSignInResult(Intent result) {
+    private void handleSignInResultForBackup(Intent result) {
         GoogleSignIn.getSignedInAccountFromIntent(result)
                 .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
                     @Override
@@ -239,8 +271,39 @@ public class MainActivity extends AppCompatActivity {
                                         .setApplicationName("PasswordManager")
                                         .build();
                         Log.i("Google", "Sign in OK");
-                        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService);
+                        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
                         gestioneDrive.createBackup();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Google", "Unable to sign in.", e);
+                    }
+                });
+    }
+
+    private void handleSignInResultForRestore(Intent result) {
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
+                        Log.i("Google", "Signed in as " + googleSignInAccount.getEmail());
+
+                        GoogleAccountCredential credential =
+                                GoogleAccountCredential.usingOAuth2(
+                                        getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
+                        credential.setSelectedAccountName(googleSignInAccount.getAccount().name);
+                        com.google.api.services.drive.Drive googleDriveService =
+                                new com.google.api.services.drive.Drive.Builder(
+                                        AndroidHttp.newCompatibleTransport(),
+                                        new GsonFactory(),
+                                        credential)
+                                        .setApplicationName("PasswordManager")
+                                        .build();
+                        Log.i("Google", "Sign in OK");
+                        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
+                        gestioneDrive.createRestore();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

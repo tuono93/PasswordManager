@@ -23,6 +23,7 @@ import java.util.List;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.password.ManagePassword;
 
 public class DettaglioAccountActivity extends AppCompatActivity {
 
@@ -67,16 +68,22 @@ public class DettaglioAccountActivity extends AppCompatActivity {
 
         action = Action.getEnumStatoGestione(getIntent().getStringExtra("action"));
         if(action == Action.UPDATE){
-            String nomeAccount = getIntent().getStringExtra("nomeAccount");
-            String nomeUtente = getIntent().getStringExtra("nomeUtente");
-            String password = getIntent().getStringExtra("password");
-            String note = getIntent().getStringExtra("note");
-            id = getIntent().getIntExtra("id",0);
-
-            actv.setText(nomeAccount);
-            editNomeAccount.setText(nomeUtente);
-            editPassword.setText(password);
-            editNote.setText(note);
+            try {
+                String nomeAccount = getIntent().getStringExtra("nomeAccount");
+                String nomeUtente = getIntent().getStringExtra("nomeUtente");
+                String password = getIntent().getStringExtra("password");
+                String note = getIntent().getStringExtra("note");
+                id = getIntent().getIntExtra("id", 0);
+                ManagePassword pwd = new ManagePassword();
+                password = pwd.decrypt(password);
+                actv.setText(nomeAccount);
+                editNomeAccount.setText(nomeUtente);
+                editPassword.setText(password);
+                editNote.setText(note);
+            } catch (Exception e){
+                String error = "Errore nel decriptaggio dell'account";
+                Toast.makeText(activity,error,Toast.LENGTH_SHORT).show();
+            }
         };
     }
 
@@ -113,15 +120,22 @@ public class DettaglioAccountActivity extends AppCompatActivity {
 
                         String error = checkTextinput(nomeAccount,nomeUtente,password,note);
                         if(error.equals("")){
-                            if (action == Action.INSERT){
-                                Account account = new Account(nomeAccount,nomeUtente,password,note);
-                                db = PasswordManagerDatabase.getDatabase(activity);
-                                insertUpdateAccountDB(account,true);
-                            } else {
-                                Account account = new Account(nomeAccount,nomeUtente,password,note);
-                                account.setId(id);
-                                db = PasswordManagerDatabase.getDatabase(activity);
-                                insertUpdateAccountDB(account,false);
+                            try {
+                                ManagePassword pwd = new ManagePassword();
+                                password = pwd.encrypt(password);
+                                if (action == Action.INSERT) {
+                                    Account account = new Account(nomeAccount, nomeUtente, password, note);
+                                    db = PasswordManagerDatabase.getDatabase(activity);
+                                    insertUpdateAccountDB(account, true);
+                                } else {
+                                    Account account = new Account(nomeAccount, nomeUtente, password, note);
+                                    account.setId(id);
+                                    db = PasswordManagerDatabase.getDatabase(activity);
+                                    insertUpdateAccountDB(account, false);
+                                }
+                            }catch (Exception e){
+                                error = "Errore nel criptaggio dell'account";
+                                Toast.makeText(activity,error,Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(activity,error,Toast.LENGTH_SHORT).show();

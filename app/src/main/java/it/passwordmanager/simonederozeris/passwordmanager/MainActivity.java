@@ -271,8 +271,6 @@ public class MainActivity extends AppCompatActivity {
                                         .setApplicationName("PasswordManager")
                                         .build();
                         Log.i("Google", "Sign in OK");
-                        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
-                        gestioneDrive.createBackup();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -302,8 +300,6 @@ public class MainActivity extends AppCompatActivity {
                                         .setApplicationName("PasswordManager")
                                         .build();
                         Log.i("Google", "Sign in OK");
-                        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
-                        gestioneDrive.createRestore();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

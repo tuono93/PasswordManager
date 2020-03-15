@@ -36,8 +36,9 @@ public class DriveServiceHelper {
     private String fileId;
     private String mimeType = "application/octet-stream";
     private String nameFileNewBackup = "" ;
-    private String nameFolderNewBackup = "PasswordManager" ;
+    private String nameFolderNewBackup = "" ;
     private String folderBackupId = "";
+    private String nameParentFolderBackup = "";
     private Context context;
 
     public DriveServiceHelper(Drive driveService,Context context) {
@@ -46,7 +47,9 @@ public class DriveServiceHelper {
     }
 
 
-    public Task<GoogleDriveFileHolder> createFolder() {
+    public Task<GoogleDriveFileHolder> createFolder(String nameFolder,String nameParentFolder) {
+        this.nameParentFolderBackup = nameParentFolder;
+        this.nameFolderNewBackup = nameFolder;
         return Tasks.call(mExecutor, new Callable<GoogleDriveFileHolder>() {
             @Override
             public GoogleDriveFileHolder call() throws Exception {
@@ -55,7 +58,7 @@ public class DriveServiceHelper {
                 try {
                     googleDriveFileHolder = new GoogleDriveFileHolder();
                     File metadata = new File()
-                            .setParents(Arrays.asList(new ParentReference().setId("root")))
+                            .setParents(Arrays.asList(new ParentReference().setId(nameParentFolderBackup)))
                             .setMimeType(DriveFolder.MIME_TYPE)
                             .setTitle(nameFolderNewBackup);
 
@@ -111,7 +114,8 @@ public class DriveServiceHelper {
         });
     }
 
-    public Task<GoogleDriveFileHolder> searchFolder() {
+    public Task<GoogleDriveFileHolder> searchFolder(String nameFolder) {
+        this.nameFolderNewBackup = nameFolder;
         return Tasks.call(mExecutor, new Callable<GoogleDriveFileHolder>() {
             @Override
             public GoogleDriveFileHolder call() throws Exception {

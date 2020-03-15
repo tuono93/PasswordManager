@@ -1,7 +1,6 @@
 package it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,13 +11,9 @@ import com.google.gson.Gson;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Date;
 
-import it.passwordmanager.simonederozeris.passwordmanager.Constant;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 
 public class GestisciOperazioniDrive {
@@ -37,17 +32,58 @@ public class GestisciOperazioniDrive {
 
 
     public void createBackup(){
-        driveServiceHelper.searchFolder()
+        driveServiceHelper.searchFolder("PasswordManager")
                 .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                     @Override
                     public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
                         Gson gson = new Gson();
                         Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
                         if(googleDriveFileHolder.getId()==null){
-                            createBackupAndFileFolder();
+                            createRootBackupFolder();
                         } else {
-                            createBackupFile(googleDriveFileHolder.getId(),"account_db");
+                            createBackupSubFolder(googleDriveFileHolder.getId());
                         }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Google", "onFailure: " + e.getMessage());
+                    }
+                });
+    }
+
+
+    public void createRootBackupFolder(){
+        driveServiceHelper.createFolder("PasswordManager","root")
+                .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                    @Override
+                    public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
+                        Gson gson = new Gson();
+                        Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
+                        createBackupSubFolder(googleDriveFileHolder.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Google", "onFailure: " + e.getMessage());
+                    }
+                });
+    }
+
+    public void createBackupSubFolder(String parentFolder){
+        this.idFolderBackup = parentFolder;
+        Date date = new Date();
+        long timeMilli = date.getTime();
+        String newFolder = "" + timeMilli;
+        driveServiceHelper.createFolder(newFolder,idFolderBackup)
+                .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                    @Override
+                    public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
+                        Gson gson = new Gson();
+                        Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
+                        createBackupFile(googleDriveFileHolder.getId(),"account_db");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -83,23 +119,6 @@ public class GestisciOperazioniDrive {
                     });
     }
 
-    public void createBackupAndFileFolder(){
-        driveServiceHelper.createFolder()
-                .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                    @Override
-                    public void onSuccess(GoogleDriveFileHolder googleDriveFileHolder) {
-                        Gson gson = new Gson();
-                        Log.d("Google", "onSuccess: " + gson.toJson(googleDriveFileHolder));
-                        createBackupFile(googleDriveFileHolder.getId(),"account_db");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("Google", "onFailure: " + e.getMessage());
-                    }
-                });
-    }
 
     public void createRestore(){
         createRestore("account_db");

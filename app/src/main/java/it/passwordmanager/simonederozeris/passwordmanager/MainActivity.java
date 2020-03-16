@@ -127,19 +127,15 @@ public class MainActivity extends AppCompatActivity {
                         Fragment fragmentCheckPwd = CheckPwdFragment.newInstance(new FlussoModificaPwd(), TipoStatoPwd.OK,R.id.anchor_point_main);
                         getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentCheckPwd).commit();
                         break;
-                    case R.id.backup:
+                    case R.id.backup_restore:
                         mainActivity.optionsMenu.getItem(1).setVisible(false);
                         Toolbar.LayoutParams params3 = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
                         params3.setMargins(0,0,150,0);
                         titleToolbar.setLayoutParams(params3);
-                        createBackup();
-                        break;
-                    case R.id.restore:
-                        mainActivity.optionsMenu.getItem(1).setVisible(false);
-                        Toolbar.LayoutParams params4 = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
-                        params4.setMargins(0,0,150,0);
-                        titleToolbar.setLayoutParams(params4);
-                        createRestore();
+
+                        Fragment fragmentBackupRestore = BackupRestoreFragment.newInstance();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentBackupRestore).commit();
+
                         break;
                     case R.id.esci:
                         String title = "Uscita";

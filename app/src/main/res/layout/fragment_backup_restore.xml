@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BackupRestoreFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/textSignIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:text="@string/sign_in"
+        android:layout_margin="10dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/White"
+        android:textSize="18dp"
+        android:textStyle="italic" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_button"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textSignIn"
+        android:layout_centerHorizontal="true"
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/textLogIn"
+        android:layout_below="@+id/google_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="sans-serif"
+        android:layout_centerHorizontal="true"
+        android:text="Sei registrato con simone.derozeris@gmail.com"
+        android:layout_margin="10dp"
+        android:textColor="@color/White"
+        android:textSize="18dp"
+        android:textStyle="italic" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/textLogIn"
+        android:layout_marginTop="10dp"
+        android:id="@+id/buttons"
+        >
+
+    <Button
+        android:id="@+id/backup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text=" Backup "
+        android:drawableLeft="@drawable/baseline_backup_black_24dp"
+        android:textSize="14dp"
+        />
+
+    <Button
+        android:id="@+id/restore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/baseline_restore_black_24dp"
+        android:layout_marginLeft="40dp"
+        android:padding="6dp"
+        android:text=" Restore "
+        android:textSize="14dp" />
+
+</LinearLayout>
+
+
+    <TextView
+        android:id="@+id/textChangeSignIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttons"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif"
+        android:text="@string/change_sign_in"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/White"
+        android:textSize="18dp"
+        android:textStyle="italic" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_button_change"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textChangeSignIn"
+        android:layout_centerHorizontal="true"
+        android:textSize="18dp" />
+
+</RelativeLayout>

@@ -15,16 +15,12 @@
     <string name="modifyAccount">Account modificato</string>
     <string name="deleteAccount">Account eliminati</string>
     <string name="noAccount">Non ci sono account</string>
-    <string name="backup_string">Backup</string>
-    <string name="restore_string">Restore</string>
+    <string name="backup__restore_string">Backup/Restore</string>
+    <string name="backup_string"> Backup</string>
+    <string name="restore_string"> Restore</string>
+    <string name="sign_in">Registrati con il tuo account Google per effettuare il backup e restore su Google Drive</string>
+    <string name="change_sign_in">Vuoi cambiare account su cui effettuare il backup e il restore?</string>
     <string name="server_client_id">853177087172-dsgup77v80d14l5d01giq08jdn0t9i7h.apps.googleusercontent.com</string>
-
-
-
-
-
-
-
 
 
     <!-- TODO: Remove or change this placeholder text -->

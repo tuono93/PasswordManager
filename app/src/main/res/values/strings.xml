@@ -19,7 +19,9 @@
     <string name="backup_string"> Backup</string>
     <string name="restore_string"> Restore</string>
     <string name="sign_in">Registrati con il tuo account Google per effettuare il backup e restore su Google Drive</string>
-    <string name="change_sign_in">Vuoi cambiare account su cui effettuare il backup e il restore?</string>
+    <string name="change_sign_in">Vuoi fare il logout o cambiare account su cui effettuare il backup e il restore?</string>
+    <string name="registrazione_google">Registrazione con Google effettuata con successo</string>
+    <string name="deregistrazione_google">Account Google non più associato</string>
     <string name="server_client_id">853177087172-dsgup77v80d14l5d01giq08jdn0t9i7h.apps.googleusercontent.com</string>
 
 

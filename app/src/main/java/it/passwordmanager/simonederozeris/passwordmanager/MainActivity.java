@@ -56,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
     public Menu optionsMenu;
     public boolean startIntent = false;
     public boolean drawerOpened = false;
-    private static final int REQUEST_CODE_SIGN_IN_FOR_BACKUP = 100;
-    private static final int REQUEST_CODE_SIGN_IN_FOR_RESTORE = 200;
-    private GoogleSignInClient mGoogleSignInClient;
     private DriveServiceHelper mDriveServiceHelper;
 
 
@@ -165,9 +162,7 @@ public class MainActivity extends AppCompatActivity {
     public void createBackup(){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
-       if (account == null) {
-            signIn(REQUEST_CODE_SIGN_IN_FOR_BACKUP);
-        } else {
+
             Log.i("Google",account.getEmail());
             GoogleAccountCredential credential =
                     GoogleAccountCredential.usingOAuth2(
@@ -184,15 +179,13 @@ public class MainActivity extends AppCompatActivity {
 
            GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
            gestioneDrive.createBackup();
-        }
+
     }
 
     public void createRestore(){
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
-        if (account == null) {
-            signIn(REQUEST_CODE_SIGN_IN_FOR_RESTORE);
-        } else {
+
             Log.i("Google",account.getEmail());
             GoogleAccountCredential credential =
                     GoogleAccountCredential.usingOAuth2(
@@ -209,101 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
             GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
             gestioneDrive.createRestore();
-        }
-    }
 
-    private void signIn(int code) {
-        mGoogleSignInClient = buildGoogleSignInClient();
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), code);
-    }
-
-    private GoogleSignInClient buildGoogleSignInClient() {
-        GoogleSignInOptions signInOptions =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestScopes(new Scope(DriveScopes.DRIVE))
-                        .requestEmail()
-                        .build();
-        return GoogleSignIn.getClient(getApplicationContext(), signInOptions);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        switch (requestCode) {
-            case REQUEST_CODE_SIGN_IN_FOR_BACKUP:
-                if (resultCode == Activity.RESULT_OK && resultData != null) {
-                    handleSignInResultForBackup(resultData);
-                }
-                break;
-            case REQUEST_CODE_SIGN_IN_FOR_RESTORE:
-                if (resultCode == Activity.RESULT_OK && resultData != null) {
-                    handleSignInResultForRestore(resultData);
-                }
-                break;
-        }
-
-        super.onActivityResult(requestCode, resultCode, resultData);
-    }
-
-    public void test() {
-        System.out.println("test");
-    }
-
-    private void handleSignInResultForBackup(Intent result) {
-        GoogleSignIn.getSignedInAccountFromIntent(result)
-                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
-                    @Override
-                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
-                        Log.i("Google", "Signed in as " + googleSignInAccount.getEmail());
-
-                        GoogleAccountCredential credential =
-                                GoogleAccountCredential.usingOAuth2(
-                                        getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
-                        credential.setSelectedAccountName(googleSignInAccount.getAccount().name);
-                        com.google.api.services.drive.Drive googleDriveService =
-                                new com.google.api.services.drive.Drive.Builder(
-                                        AndroidHttp.newCompatibleTransport(),
-                                        new GsonFactory(),
-                                        credential)
-                                        .setApplicationName("PasswordManager")
-                                        .build();
-                        Log.i("Google", "Sign in OK");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Google", "Unable to sign in.", e);
-                    }
-                });
-    }
-
-    private void handleSignInResultForRestore(Intent result) {
-        GoogleSignIn.getSignedInAccountFromIntent(result)
-                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
-                    @Override
-                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
-                        Log.i("Google", "Signed in as " + googleSignInAccount.getEmail());
-
-                        GoogleAccountCredential credential =
-                                GoogleAccountCredential.usingOAuth2(
-                                        getApplicationContext(), Collections.singleton(DriveScopes.DRIVE_FILE));
-                        credential.setSelectedAccountName(googleSignInAccount.getAccount().name);
-                        com.google.api.services.drive.Drive googleDriveService =
-                                new com.google.api.services.drive.Drive.Builder(
-                                        AndroidHttp.newCompatibleTransport(),
-                                        new GsonFactory(),
-                                        credential)
-                                        .setApplicationName("PasswordManager")
-                                        .build();
-                        Log.i("Google", "Sign in OK");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Google", "Unable to sign in.", e);
-                    }
-                });
     }
 
     @Override

@@ -6,6 +6,7 @@
     tools:context=".BackupRestoreFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <TextView
         android:id="@+id/textSignIn"
         android:layout_width="wrap_content"
@@ -96,6 +97,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textChangeSignIn"
         android:layout_centerHorizontal="true"
-        android:textSize="18dp" />
+        />
 
 </RelativeLayout>

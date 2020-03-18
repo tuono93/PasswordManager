@@ -1,6 +1,7 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.view.ViewStructure;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -40,6 +42,7 @@ import java.util.Collections;
 
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.GestisciOperazioniDrive;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.drive.GoogleDriveFileHolder;
 
 
@@ -69,6 +72,8 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
     private GoogleSignInClient mGoogleSignInClient;
     private OnFragmentInteractionListener mListener;
     Intent fromSignIn;
+    public ProgressDialog loadServizio = null;
+
 
     public BackupRestoreFragment() {}
 
@@ -158,32 +163,126 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
         google_button_change.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signOut();
+                String title = "Sign-out";
+                String message = "Vuoi effettuare il sign-out dal tuo account Google?";
+
+                new AlertDialog.Builder(mainActivity)
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                signOut();
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
 
         buttonBackup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String title = "Backup";
+                String message = "Vuoi effettuare il backup su Google Drive?";
 
+                new AlertDialog.Builder(mainActivity)
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                createBackup();
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
 
         buttonRestore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String title = "Restore";
+                String message = "Vuoi ripristinare i dati da Google Drive?";
 
+                new AlertDialog.Builder(mainActivity)
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                createRestore();
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
     }
 
+    public void setProgressBar(){
+        loadServizio = new ProgressDialog(mainActivity, android.app.AlertDialog.THEME_HOLO_DARK);
+        loadServizio.setMessage("Operazione in corso...");
+        loadServizio.setCancelable(false);
+        loadServizio.setCanceledOnTouchOutside(false);
+        loadServizio.show();
+
+    }
+
+    public void createBackup(){
+        setProgressBar();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(mainActivity.getApplicationContext());
+
+        Log.i("Google",account.getEmail());
+        GoogleAccountCredential credential =
+                GoogleAccountCredential.usingOAuth2(
+                        mainActivity.getApplicationContext(), Collections.singleton(DriveScopes.DRIVE));
+        credential.setSelectedAccountName(account.getAccount().name);
+
+        com.google.api.services.drive.Drive googleDriveService =
+                new com.google.api.services.drive.Drive.Builder(
+                        AndroidHttp.newCompatibleTransport(),
+                        new GsonFactory(),
+                        credential)
+                        .setApplicationName("PasswordManager")
+                        .build();
+
+        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
+        gestioneDrive.createBackup(loadServizio);
+
+    }
+
+    public void createRestore(){
+        setProgressBar();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(mainActivity.getApplicationContext());
+
+
+        Log.i("Google",account.getEmail());
+        GoogleAccountCredential credential =
+                GoogleAccountCredential.usingOAuth2(
+                        mainActivity.getApplicationContext(), Collections.singleton(DriveScopes.DRIVE));
+        credential.setSelectedAccountName(account.getAccount().name);
+
+        com.google.api.services.drive.Drive googleDriveService =
+                new com.google.api.services.drive.Drive.Builder(
+                        AndroidHttp.newCompatibleTransport(),
+                        new GsonFactory(),
+                        credential)
+                        .setApplicationName("PasswordManager")
+                        .build();
+
+        GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
+        gestioneDrive.createRestore(loadServizio);
+
+    }
+
     private void signOut() {
+        setProgressBar();
+
         mGoogleSignInClient = buildGoogleSignInClient();
         mGoogleSignInClient.signOut()
                 .addOnSuccessListener(new OnSuccessListener<Object>() {
                     @Override
                     public void onSuccess(Object o) {
                         Log.i("Google", "Not more Signed");
+                        loadServizio.dismiss();
                         MainActivity.stringSnackStatic = getString(R.string.deregistrazione_google);
                         Fragment fragmentBackupRestore = BackupRestoreFragment.newInstance();
                         mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentBackupRestore).commit();
@@ -192,6 +291,8 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        loadServizio.dismiss();
+                        Toast.makeText(mainActivity, "Errore nel collegamento a Google", Toast.LENGTH_LONG).show();
                         Log.d("Google", "onFailure: " + e.getMessage());
                     }
          });
@@ -199,6 +300,8 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
 
 
      private void signIn() {
+        setProgressBar();
+
         mGoogleSignInClient = buildGoogleSignInClient();
         startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
     }
@@ -218,8 +321,14 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
             case REQUEST_CODE_SIGN_IN:
                 if (resultCode == Activity.RESULT_OK && resultData != null) {
                     handleSignInResultForBackup(resultData);
+                }else {
+                    Toast.makeText(mainActivity, "Errore nel collegamento a Google", Toast.LENGTH_LONG).show();
+                    loadServizio.dismiss();
                 }
                 break;
+            default:
+                Toast.makeText(mainActivity, "Errore nel collegamento a Google", Toast.LENGTH_LONG).show();
+                loadServizio.dismiss();
         }
 
         super.onActivityResult(requestCode, resultCode, resultData);
@@ -245,6 +354,7 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
                                         .setApplicationName("PasswordManager")
                                         .build();
 
+                        loadServizio.dismiss();
                         MainActivity.stringSnackStatic = getString(R.string.registrazione_google);
                         Fragment fragmentBackupRestore = BackupRestoreFragment.newInstance();
                         mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.anchor_point_main,fragmentBackupRestore).commit();
@@ -254,6 +364,8 @@ public class BackupRestoreFragment extends Fragment implements OnBackPressed {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        loadServizio.dismiss();
+                        Toast.makeText(mainActivity, "Errore nel collegamento a Google", Toast.LENGTH_LONG).show();
                         Log.e("Google", "Unable to sign in.", e);
                     }
                 });

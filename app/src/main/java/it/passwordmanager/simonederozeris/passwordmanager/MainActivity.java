@@ -159,52 +159,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void createBackup(){
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-
-
-            Log.i("Google",account.getEmail());
-            GoogleAccountCredential credential =
-                    GoogleAccountCredential.usingOAuth2(
-                            getApplicationContext(), Collections.singleton(DriveScopes.DRIVE));
-            credential.setSelectedAccountName(account.getAccount().name);
-
-            com.google.api.services.drive.Drive googleDriveService =
-                    new com.google.api.services.drive.Drive.Builder(
-                            AndroidHttp.newCompatibleTransport(),
-                            new GsonFactory(),
-                            credential)
-                            .setApplicationName("PasswordManager")
-                            .build();
-
-           GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
-           gestioneDrive.createBackup();
-
-    }
-
-    public void createRestore(){
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-
-
-            Log.i("Google",account.getEmail());
-            GoogleAccountCredential credential =
-                    GoogleAccountCredential.usingOAuth2(
-                            getApplicationContext(), Collections.singleton(DriveScopes.DRIVE));
-            credential.setSelectedAccountName(account.getAccount().name);
-
-            com.google.api.services.drive.Drive googleDriveService =
-                    new com.google.api.services.drive.Drive.Builder(
-                            AndroidHttp.newCompatibleTransport(),
-                            new GsonFactory(),
-                            credential)
-                            .setApplicationName("PasswordManager")
-                            .build();
-
-            GestisciOperazioniDrive gestioneDrive = new GestisciOperazioniDrive(googleDriveService,mainActivity);
-            gestioneDrive.createRestore();
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_toolbar_main_long_click,menu);

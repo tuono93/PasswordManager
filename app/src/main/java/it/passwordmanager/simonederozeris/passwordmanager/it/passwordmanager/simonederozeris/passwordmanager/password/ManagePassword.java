@@ -60,12 +60,12 @@ public class ManagePassword {
         {
             ManagePassword td= new ManagePassword();
 
-            String target="test";
-            String encrypted=td.encrypt(target);
-            String decrypted=td.decrypt(encrypted);
+            String target="ciaociao";
+            //String encrypted=td.encrypt(target);
+            String decrypted=td.decrypt(target);
 
-            System.out.println("String To Encrypt: "+ target);
-            System.out.println("Encrypted String:" + encrypted);
+            //System.out.println("String To Encrypt: "+ target);
+            //System.out.println("Encrypted String:" + encrypted);
             System.out.println("Decrypted String:" + decrypted);
         }
 }

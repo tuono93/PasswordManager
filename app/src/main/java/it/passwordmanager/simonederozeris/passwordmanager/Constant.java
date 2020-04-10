@@ -11,4 +11,7 @@ public class Constant {
                                             "MyCicero","MyFastweb","MyVodafone","Nexi","PosteMobile","PrimeVideo","RaiPlay",
                                             "TheFork","TicketOne","Trenitalia","Trivago","Vivaticket","WindTre","Zalando"
                                             };
+    public static String ENCRYPT_OLD_PWD = "ENCRYPT_OLD_PWD";
+    public static String ENCRYPT_OLD_PWD_VALUE = "ENCRYPT_OLD_PWD_VALUE";
+
 }

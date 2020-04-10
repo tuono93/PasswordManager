@@ -1,10 +1,12 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -26,11 +28,16 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.List;
+
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.GestioneFlussoApp;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.Account;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.database.PasswordManagerDatabase;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.Flusso;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoCheckPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.FlussoModificaPwd;
 import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoStatoPwd;
+import it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.password.ManagePassword;
 
 import static it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoCheckPwd.CHECK;
 import static it.passwordmanager.simonederozeris.passwordmanager.it.passwordmanager.simonederozeris.passwordmanager.flusso.TipoNuovaPwd.CONFERMA;
@@ -59,6 +66,9 @@ public class CheckPwdFragment extends Fragment {
     private Flusso flusso;
     private TipoStatoPwd stato;
     private int layout_container;
+    private Exception mException = null;
+    private PasswordManagerDatabase db;
+    private CheckPwdActivity checkPwdActivity;
 
     private static int getNumFlusso(Flusso flusso){
         int numFlusso;
@@ -168,6 +178,7 @@ public class CheckPwdFragment extends Fragment {
     @Override
     public void onAttach(Activity activity){
         super.onAttach(activity);
+        checkPwdActivity = (CheckPwdActivity)activity;
     }
 
     @Override
@@ -320,13 +331,83 @@ public class CheckPwdFragment extends Fragment {
                     } else {
                         if (passcode.equalsIgnoreCase(passcodeSalvato)) {
                             flusso.goNextStep(CHECK.getStep());
-                            passwordEsatta(false);
+                            checkEncryptOldPwdAndPasswordEsatta();
                         } else {
                             passwordErrata();
                         }
                     }
 
                     break;
+            }
+        }
+    }
+
+    public void checkEncryptOldPwdAndPasswordEsatta(){
+        sharedPreferences = checkPwdActivity.getSharedPreferences(Constant.ENCRYPT_OLD_PWD, Context.MODE_PRIVATE);
+
+        if(sharedPreferences.getString(Constant.ENCRYPT_OLD_PWD_VALUE,null)==null){
+            db = PasswordManagerDatabase.getDatabase(checkPwdActivity);
+            setEncyptOldPwdAndPasswordEsatta();
+        } else {
+            passwordEsatta(false);
+        }
+    }
+
+    public void setEncyptOldPwdAndPasswordEsatta(){
+        mException = null;
+        new CheckPwdFragment.ReadDBAsync().execute();
+        db.destroyInstance();
+    }
+
+    private class ReadDBAsync extends AsyncTask<Void,Void, List<Account>> {
+
+        ReadDBAsync(){}
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            checkPwdActivity.loadEncrypt = new ProgressDialog(checkPwdActivity, android.app.AlertDialog.THEME_HOLO_DARK);
+            checkPwdActivity.loadEncrypt.setMessage("Verifica operazioni di criptaggio");
+            checkPwdActivity.loadEncrypt.setCancelable(false);
+            checkPwdActivity.loadEncrypt.setCanceledOnTouchOutside(false);
+            checkPwdActivity.loadEncrypt.show();
+        }
+
+        @Override
+        protected List<Account> doInBackground(Void... voids) {
+            List<Account> accountList = null;
+            try {
+                accountList = db.getAccountDAO().findAllAccount();
+                ManagePassword managePassword = new ManagePassword();
+
+                for (Account account : accountList){
+                    String encryptPwd = managePassword.encrypt(account.getPassword());
+                    account.setPassword(encryptPwd);
+                    db.getAccountDAO().updateAccount(account);
+                }
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(Constant.ENCRYPT_OLD_PWD_VALUE,"OK");
+                editor.commit();
+            }  catch (Exception e) {
+                mException = e;
+            }
+            return accountList;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... voids) {
+            super.onProgressUpdate(voids);
+        }
+
+        @Override
+        protected void onPostExecute(List<Account> result) {
+            super.onPostExecute(result);
+            if(mException == null){
+                checkPwdActivity.loadEncrypt.dismiss();
+                passwordEsatta(false);
+            } else {
+                checkPwdActivity.loadEncrypt.dismiss();
+                Toast.makeText(checkPwdActivity,"Errore nel criptaggio delle vecchie password. Riprova",Toast.LENGTH_LONG).show();
             }
         }
     }

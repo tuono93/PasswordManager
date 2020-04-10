@@ -68,11 +68,11 @@ public class DettaglioAccountActivity extends AppCompatActivity {
 
         action = Action.getEnumStatoGestione(getIntent().getStringExtra("action"));
         if(action == Action.UPDATE){
+            String nomeAccount = getIntent().getStringExtra("nomeAccount");
+            String nomeUtente = getIntent().getStringExtra("nomeUtente");
+            String password = getIntent().getStringExtra("password");
+            String note = getIntent().getStringExtra("note");
             try {
-                String nomeAccount = getIntent().getStringExtra("nomeAccount");
-                String nomeUtente = getIntent().getStringExtra("nomeUtente");
-                String password = getIntent().getStringExtra("password");
-                String note = getIntent().getStringExtra("note");
                 id = getIntent().getIntExtra("id", 0);
                 ManagePassword pwd = new ManagePassword();
                 password = pwd.decrypt(password);
@@ -81,7 +81,10 @@ public class DettaglioAccountActivity extends AppCompatActivity {
                 editPassword.setText(password);
                 editNote.setText(note);
             } catch (Exception e){
-                String error = "Errore nel decriptaggio dell'account";
+                actv.setText(nomeAccount);
+                editNomeAccount.setText(nomeUtente);
+                editNote.setText(note);
+                String error = "Errore nel decriptaggio della password";
                 Toast.makeText(activity,error,Toast.LENGTH_SHORT).show();
             }
         };

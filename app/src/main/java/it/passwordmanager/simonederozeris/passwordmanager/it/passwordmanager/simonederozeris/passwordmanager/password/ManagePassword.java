@@ -28,30 +28,25 @@ public class ManagePassword {
         }
 
 
-        public String encrypt(String unencryptedString) {
+        public String encrypt(String unencryptedString) throws Exception {
             String encryptedString = null;
-            try {
-                cipher.init(Cipher.ENCRYPT_MODE, key);
-                byte[] plainText = unencryptedString.getBytes(UNICODE_FORMAT);
-                byte[] encryptedText = cipher.doFinal(plainText);
-                encryptedString = new String(Base64.encodeBase64(encryptedText));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            byte[] plainText = unencryptedString.getBytes(UNICODE_FORMAT);
+            byte[] encryptedText = cipher.doFinal(plainText);
+            encryptedString = new String(Base64.encodeBase64(encryptedText));
+
             return encryptedString;
         }
 
 
-        public String decrypt(String encryptedString) {
+        public String decrypt(String encryptedString) throws Exception{
             String decryptedText=null;
-            try {
-                cipher.init(Cipher.DECRYPT_MODE, key);
-                byte[] encryptedText = Base64.decodeBase64(encryptedString.getBytes());
-                byte[] plainText = cipher.doFinal(encryptedText);
-                decryptedText= new String(plainText);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] encryptedText = Base64.decodeBase64(encryptedString.getBytes());
+            byte[] plainText = cipher.doFinal(encryptedText);
+            decryptedText= new String(plainText);
+
             return decryptedText;
         }
 

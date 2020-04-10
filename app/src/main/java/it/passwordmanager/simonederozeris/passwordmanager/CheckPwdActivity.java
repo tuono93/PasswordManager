@@ -1,5 +1,6 @@
 package it.passwordmanager.simonederozeris.passwordmanager;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -16,6 +17,7 @@ public class CheckPwdActivity extends AppCompatActivity {
 
     public Toolbar toolbar;
     private String PASSCODE = "passcode";
+    public ProgressDialog loadEncrypt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

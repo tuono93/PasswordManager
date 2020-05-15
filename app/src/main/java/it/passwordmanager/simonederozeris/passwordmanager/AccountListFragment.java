@@ -167,8 +167,12 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     public void onBackPressed() {
         if(longClickState || searchClick){
             backFromLongClick();
+            mainActivity.titleToolbar.setVisibility(View.VISIBLE);
         } else if (mainActivity.drawerOpened){
             mainActivity.drawerLayout.closeDrawer(Gravity.LEFT);
+        } else if (mainActivity.searchOpened){
+            titleToolbar.setVisibility(View.VISIBLE);
+            mainActivity.searchOpened = false;
         } else {
             String title = "Uscita";
             String message = "Vuoi davvero uscire dall'app?";
@@ -197,7 +201,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
         if (countSelect == 0){
             backFromLongClick();
         } else {
-            String title = countSelect == 1 ? countSelect + " nomeAccount selezionato" : countSelect + " nomeAccount selezionati";
+            String title = countSelect == 1 ? countSelect + " account selezionato" : countSelect + " account selezionati";
             titleToolbar.setText(title);
         }
     }
@@ -328,9 +332,7 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     }
 
     @Override
-    public void onSearchClose() {
-        backFromLongClick();
-    }
+    public void onSearchClose() { backFromLongClick(); }
 
     @Override
     public void onSearchQueryChange(String query) {
@@ -394,8 +396,8 @@ public class AccountListFragment extends Fragment implements OnBackPressed,Manag
     }
 
     public void eliminaAccountDB(){
-        String title = "Eliminazione nomeAccount";
-        String message = countSelect==1 ? "Vuoi davvero eliminare l'nomeAccount selezionato?" : "Vuoi davvero eliminare i " + countSelect + " nomeAccount selezionati?";
+        String title = "Eliminazione Account";
+        String message = countSelect==1 ? "Vuoi davvero eliminare l'account selezionato?" : "Vuoi davvero eliminare i " + countSelect + " account selezionati?";
 
         new AlertDialog.Builder(getActivity())
                 .setTitle(title)

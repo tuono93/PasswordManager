@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public Menu optionsMenu;
     public boolean startIntent = false;
     public boolean drawerOpened = false;
+    public boolean searchOpened = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -273,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
                 (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         searchAutoComplete.setHintTextColor(getColor(R.color.Gray));
         searchAutoComplete.setTextColor(getColor(R.color.White));
+        searchAutoComplete.setGravity(Gravity.CENTER_VERTICAL);
         ImageView searchIcon = (ImageView)searchView.findViewById(androidx.appcompat.R.id.search_button);
         searchIcon.setImageDrawable(getDrawable(R.drawable.search));
 
@@ -294,6 +296,8 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public boolean onClose() {
                             Log.d("SEARCH_VIEW","Search closed");
+                            titleToolbar.setVisibility(View.VISIBLE);
+                            searchOpened = false;
                             fragList.onSearchClose();
                             return false;
                         }
@@ -302,8 +306,10 @@ public class MainActivity extends AppCompatActivity {
                     searchView.setOnSearchClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            fragList.onSearchOpen();
                             Log.d("SEARCH_VIEW","Search Click");
+                            titleToolbar.setVisibility(View.GONE);
+                            searchOpened = true;
+                            fragList.onSearchOpen();
                         }
                     });
 

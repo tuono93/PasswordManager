@@ -17,7 +17,7 @@ public class CheckPwdActivity extends AppCompatActivity {
 
     public Toolbar toolbar;
     private String PASSCODE = "passcode";
-    public ProgressDialog loadEncrypt;
+    //public ProgressDialog loadEncrypt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

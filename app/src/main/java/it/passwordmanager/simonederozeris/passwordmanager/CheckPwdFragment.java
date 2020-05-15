@@ -68,7 +68,7 @@ public class CheckPwdFragment extends Fragment {
     private int layout_container;
     private Exception mException = null;
     private PasswordManagerDatabase db;
-    private CheckPwdActivity checkPwdActivity;
+    ProgressDialog loadEncrypt;
 
     private static int getNumFlusso(Flusso flusso){
         int numFlusso;
@@ -178,7 +178,6 @@ public class CheckPwdFragment extends Fragment {
     @Override
     public void onAttach(Activity activity){
         super.onAttach(activity);
-        checkPwdActivity = (CheckPwdActivity)activity;
     }
 
     @Override
@@ -343,10 +342,10 @@ public class CheckPwdFragment extends Fragment {
     }
 
     public void checkEncryptOldPwdAndPasswordEsatta(){
-        sharedPreferences = checkPwdActivity.getSharedPreferences(Constant.ENCRYPT_OLD_PWD, Context.MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences(Constant.ENCRYPT_OLD_PWD, Context.MODE_PRIVATE);
 
         if(sharedPreferences.getString(Constant.ENCRYPT_OLD_PWD_VALUE,null)==null){
-            db = PasswordManagerDatabase.getDatabase(checkPwdActivity);
+            db = PasswordManagerDatabase.getDatabase(getActivity());
             setEncyptOldPwdAndPasswordEsatta();
         } else {
             passwordEsatta(false);
@@ -366,11 +365,11 @@ public class CheckPwdFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            checkPwdActivity.loadEncrypt = new ProgressDialog(checkPwdActivity, android.app.AlertDialog.THEME_HOLO_DARK);
-            checkPwdActivity.loadEncrypt.setMessage("Verifica operazioni di criptaggio");
-            checkPwdActivity.loadEncrypt.setCancelable(false);
-            checkPwdActivity.loadEncrypt.setCanceledOnTouchOutside(false);
-            checkPwdActivity.loadEncrypt.show();
+            loadEncrypt = new ProgressDialog(getActivity(), android.app.AlertDialog.THEME_HOLO_DARK);
+            loadEncrypt.setMessage("Verifica operazioni di criptaggio");
+            loadEncrypt.setCancelable(false);
+            loadEncrypt.setCanceledOnTouchOutside(false);
+            loadEncrypt.show();
         }
 
         @Override
@@ -403,11 +402,11 @@ public class CheckPwdFragment extends Fragment {
         protected void onPostExecute(List<Account> result) {
             super.onPostExecute(result);
             if(mException == null){
-                checkPwdActivity.loadEncrypt.dismiss();
+                loadEncrypt.dismiss();
                 passwordEsatta(false);
             } else {
-                checkPwdActivity.loadEncrypt.dismiss();
-                Toast.makeText(checkPwdActivity,"Errore nel criptaggio delle vecchie password. Riprova",Toast.LENGTH_LONG).show();
+                loadEncrypt.dismiss();
+                Toast.makeText(getActivity(),"Errore nel criptaggio delle vecchie password. Riprova",Toast.LENGTH_LONG).show();
             }
         }
     }
